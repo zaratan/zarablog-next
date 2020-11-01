@@ -1,0 +1,22 @@
+@import '../styles/theme';
+
+.fileName {
+  color: $orange;
+  @include themed {
+    background-color: t('base2');
+  }
+  margin-bottom: -9px;
+  padding: 0.4rem 1rem;
+  font-style: italic;
+  display: block;
+  border-radius: 0.3em 0.3em 0 0;
+  ::before {
+    @include themed {
+      color: t('base1');
+    }
+    content: 'FILE: ';
+  }
+  & + div pre {
+    border-radius: 0;
+  }
+}

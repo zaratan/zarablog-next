@@ -1,0 +1,49 @@
+@import '../styles/theme';
+
+.titleList {
+  margin: 50px 20px 20px 20px;
+}
+
+.titleItem {
+  display: flex;
+  transition: padding 0.2s ease-in-out;
+  font-size: 20px;
+  @include themed {
+    color: t('base1');
+  }
+  &:hover {
+    padding-left: 20px;
+    @include themed {
+      color: t('base1');
+    }
+  }
+  &:focus {
+    padding-left: 20px;
+    @include themed {
+      color: t('base1');
+    }
+  }
+  
+  // Fallback during font load
+  font-family: Consolas, Monaco, monospace;
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: 0.39px;
+  &.inconsolataLoaded {
+    font-family: Inconsolata, Consolas, Monaco, monospace;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  &:global(.profile-open) {
+    @media only screen and (max-width: 1310px) {
+      flex-direction: column;
+    }
+  }
+  &:not(:global(.profile-open)) {
+    @media only screen and (max-width: 910px) {
+      flex-direction: column;
+    }
+  }
+}

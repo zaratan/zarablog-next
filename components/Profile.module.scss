@@ -1,0 +1,32 @@
+.space {
+  padding: 0 0.3rem;
+}
+
+.pictureContainer {
+  font-size: 5px;
+  line-height: 2px;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 200px;
+  height: 200px;
+  margin: 10px 0;
+  background-color: black;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+  &:hover {
+    opacity: 1;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  position: relative;
+}
+
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+  height: 100%;
+  font-family: Inconsolata;
+}

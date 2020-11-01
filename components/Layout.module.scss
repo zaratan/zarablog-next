@@ -1,0 +1,61 @@
+@import '../styles/theme';
+
+.main {
+  @include themed {
+    background-color: t('base3');
+  }
+  width: 100%;
+  max-width: inherit;
+  align-self: flex-start;
+  flex-shrink: 1;
+  @media only screen and (max-width: 700px) {
+    &:global(.profile-open) {
+      display: none;
+    }
+    display: flex;
+  }
+}
+
+.mainWrapper {
+  @include themed {
+    background-color: t('base3');
+  }
+  width: 100%;
+  max-width: inherit;
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding-top: 40px;
+}
+
+.footer {
+  @include themed {
+    background-color: t('base2');
+  }
+  color: $yellow;
+  display: flex;
+  justify-content: center;
+  height: 25px;
+  align-items: center;
+}
+
+.asideProfile {
+  display: none;
+
+  &:global(.profile-open) {
+    display: block
+  }
+
+  @media only screen and (min-width: 700px) {
+    width: 400px;
+    min-width: 400px;
+    border-left: 1px solid $yellow;
+  }
+  @media only screen and (max-width: 800px) {
+    min-width: 300px;
+  }
+  @media only screen and (max-width: 700px) {
+    min-width: 100px;
+  }
+}

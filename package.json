@@ -17,8 +17,8 @@
     "react": "17.0.1",
     "react-device-detect": "^1.14.0",
     "react-dom": "17.0.1",
-    "react-is": "^17.0.1",
-    "styled-components": "^5.2.0"
+    "react-icons": "^3.11.0",
+    "react-is": "^17.0.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.163",
@@ -39,7 +39,9 @@
     "husky": "^4.3.0",
     "lint-staged": "^10.5.0",
     "prettier": "^2.1.2",
-    "typescript": "^4.0.5"
+    "sass": "^1.28.0",
+    "typescript": "^4.0.5",
+    "webpack-bundle-analyzer": "^3.9.0"
   },
   "husky": {
     "hooks": {

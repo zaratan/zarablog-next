@@ -1,4 +1,4 @@
-@import '../styles/theme';
+@import "../styles/theme";
 
 .articleContainer {
   max-width: 800px;
@@ -88,7 +88,6 @@
 }
 
 .articleInfos {
-
   display: flex;
   justify-content: space-around;
   &:global(.profile-open) {
@@ -105,9 +104,8 @@
 }
 
 .articleInfo {
-
   margin: 0 3rem;
- 
+
   &:global(.profile-open) {
     @media (max-width: 900px) {
       margin: 0.2rem 0;

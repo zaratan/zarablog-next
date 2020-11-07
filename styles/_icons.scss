@@ -1,0 +1,20 @@
+svg:not(:root).svg-inline--fa {
+  overflow: visible;
+}
+
+.svg-inline--fa.fa-w-14 {
+  width: 0.875em;
+}
+
+svg:not(:root) {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.svg-inline--fa {
+  display: inline-block;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}

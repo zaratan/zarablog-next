@@ -1,8 +1,8 @@
-@import '../styles/theme';
+@import "../styles/theme";
 
 .main {
   @include themed {
-    background-color: t('base3');
+    background-color: t("base3");
   }
   width: 100%;
   max-width: inherit;
@@ -18,7 +18,7 @@
 
 .mainWrapper {
   @include themed {
-    background-color: t('base3');
+    background-color: t("base3");
   }
   width: 100%;
   max-width: inherit;
@@ -31,7 +31,7 @@
 
 .footer {
   @include themed {
-    background-color: t('base2');
+    background-color: t("base2");
   }
   color: $yellow;
   display: flex;
@@ -44,7 +44,7 @@
   display: none;
 
   &:global(.profile-open) {
-    display: block
+    display: block;
   }
 
   @media only screen and (min-width: 700px) {

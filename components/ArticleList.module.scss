@@ -1,4 +1,4 @@
-@import '../styles/theme';
+@import "../styles/theme";
 
 .titleList {
   margin: 50px 20px 20px 20px;
@@ -9,21 +9,21 @@
   transition: padding 0.2s ease-in-out;
   font-size: 20px;
   @include themed {
-    color: t('base1');
+    color: t("base1");
   }
   &:hover {
     padding-left: 20px;
     @include themed {
-      color: t('base1');
+      color: t("base1");
     }
   }
   &:focus {
     padding-left: 20px;
     @include themed {
-      color: t('base1');
+      color: t("base1");
     }
   }
-  
+
   // Fallback during font load
   font-family: Consolas, Monaco, monospace;
   font-size: 16px;

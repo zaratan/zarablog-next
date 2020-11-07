@@ -1,4 +1,4 @@
-@import '_theme.scss';
+@import "theme";
 
 tt,
 code {
@@ -30,58 +30,62 @@ pre tt:after {
 
 code[class*="language-"],
 pre[class*="language-"] {
-	font-family: Inconsolata, Consolas, Monaco, monospace;
-	font-size: 1em;
-	text-align: left;
-	white-space: pre;
-	word-spacing: normal;
-	word-break: normal;
-	word-wrap: normal;
+  font-family: Inconsolata, Consolas, Monaco, monospace;
+  font-size: 1em;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
 
-	line-height: 1.5;
+  line-height: 1.5;
 
-	-moz-tab-size: 4;
-	-o-tab-size: 4;
-	tab-size: 4;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
 
-	-webkit-hyphens: none;
-	-moz-hyphens: none;
-	-ms-hyphens: none;
-	hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
   @include themed {
-    color: t('base1');
+    color: t("base1");
   }
 }
 
-pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
-code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection {
   @include themed {
-    background: t('base02'); /* base02 */
-    color: t('base2');
+    background: t("base02"); /* base02 */
+    color: t("base2");
   }
 }
 
-pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
-code[class*="language-"]::selection, code[class*="language-"] ::selection {
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection,
+code[class*="language-"]::selection,
+code[class*="language-"] ::selection {
   @include themed {
-    background: t('base02'); /* base02 */
-    color: t('base2');
+    background: t("base02"); /* base02 */
+    color: t("base2");
   }
 }
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
   @include themed {
-    background-color: t('base2'); /* base3 */
+    background-color: t("base2"); /* base3 */
   }
 }
 
 /* Code blocks */
 pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
-	overflow: auto;
-	border-radius: 0.3em;
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+  border-radius: 0.3em;
 }
 
 /* Inline code */
@@ -90,13 +94,13 @@ pre[class*="language-"] {
 .token.doctype,
 .token.cdata {
   @include themed {
-    color: t('base00'); /* base1 */
+    color: t("base00"); /* base1 */
   }
 }
 
 .token.punctuation {
   @include themed {
-    color: t('base0'); /* base01 */
+    color: t("base0"); /* base01 */
   }
 }
 
@@ -107,7 +111,7 @@ pre[class*="language-"] {
 .token.constant,
 .token.symbol,
 .token.deleted {
-	color: $blue; /* blue */
+  color: $blue; /* blue */
 }
 
 .token.selector,
@@ -117,47 +121,47 @@ pre[class*="language-"] {
 .token.builtin,
 .token.url,
 .token.inserted {
-	color: $cyan; /* cyan */
+  color: $cyan; /* cyan */
 }
 
 :not(pre) > code[class*="language-"] {
-	padding: .1em;
-	border-radius: .3em;
+  padding: 0.1em;
+  border-radius: 0.3em;
 }
 
 .namespace {
-	opacity: .7;
+  opacity: 0.7;
 }
 
 .token.important,
 .token.bold {
-	font-weight: bold;
+  font-weight: bold;
 }
 .token.italic {
-	font-style: italic;
+  font-style: italic;
 }
 
 .token.entity {
   cursor: help;
   @include themed {
-    color: t('base0'); /* base00 */
-    background: t('base2'); /* base2 */
+    color: t("base0"); /* base00 */
+    background: t("base2"); /* base2 */
   }
 }
 
 .token.atrule,
 .token.attr-value,
 .token.keyword {
-	color: $green; /* green */
+  color: $green; /* green */
 }
 
 .token.function,
 .token.class-name {
-	color: $yellow; /* yellow */
+  color: $yellow; /* yellow */
 }
 
 .token.regex,
 .token.important,
 .token.variable {
-	color: $orange; /* orange */
+  color: $orange; /* orange */
 }

@@ -51,7 +51,7 @@ const Header = () => {
             tabIndex={0}
           >
             <span className={[styles.circle, styles.red].join(' ')}>
-              <FaHome className={styles.icon} />
+              <FaHome className={[styles.icon, 'svg-inline--fa'].join(' ')} />
             </span>
           </a>
         </Link>
@@ -65,9 +65,9 @@ const Header = () => {
         >
           <span className={[styles.circle, styles.yellow].join(' ')}>
             {isDark ? (
-              <FaSun className={styles.icon} />
+              <FaSun className={[styles.icon, 'svg-inline--fa'].join(' ')} />
             ) : (
-              <FaMoon className={styles.icon} />
+              <FaMoon className={[styles.icon, 'svg-inline--fa'].join(' ')} />
             )}
           </span>
         </span>
@@ -80,7 +80,9 @@ const Header = () => {
           onKeyDown={generateHandleKeypress(actOnProfileButton)}
         >
           <span className={[styles.circle, styles.green].join(' ')}>
-            <FaUser className={styles.icon} />
+            <FaUser
+              className={[styles.icon, 'svg-inline--fa', 'fa-w-14'].join(' ')}
+            />
           </span>
         </span>
       </nav>

@@ -5,6 +5,7 @@ import Document, {
   Main,
   NextScript,
 } from 'next/document';
+import GoogleFonts from 'next-google-fonts';
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -16,6 +17,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
+        <GoogleFonts href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" />
         <Head>
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />

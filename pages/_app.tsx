@@ -2,6 +2,7 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useContext, useEffect } from 'react';
+import GoogleFonts from 'next-google-fonts';
 
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';
 import { LayoutProvider } from '../contexts/LayoutContext';
@@ -21,6 +22,7 @@ const WrappedApp = ({ Component, pageProps }: AppProps) => {
 function MyApp(appProps: AppProps) {
   return (
     <>
+      <GoogleFonts href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" />
       <Head>
         <meta
           name="viewport"

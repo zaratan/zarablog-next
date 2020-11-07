@@ -1,4 +1,5 @@
 import fs from 'fs';
+import Head from 'next/head';
 import path from 'path';
 import { GetStaticProps } from 'next';
 import renderToString from 'next-mdx-remote/render-to-string';
@@ -60,18 +61,31 @@ const Article = ({ article }: { article: { mdx: any; data: any } }) => {
   const content = hydrate(article.mdx, {
     components,
   });
+  const title = `Zaratan@next: ${article.data.title}`;
+  const { description } = article.data;
   return (
-    <Layout>
-      <MDXProvider>
-        <ArticleContainer
-          title={article.data.title}
-          timeToRead={article.data.readingTime}
-          date={article.data.date}
-        >
-          {content}
-        </ArticleContainer>
-      </MDXProvider>
-    </Layout>
+    <>
+      <Head>
+        <title>Zaratan@next: {article.data.title}</title>
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content={description} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+      </Head>
+      <Layout>
+        <MDXProvider>
+          <ArticleContainer
+            title={article.data.title}
+            timeToRead={article.data.readingTime}
+            date={article.data.date}
+          >
+            {content}
+          </ArticleContainer>
+        </MDXProvider>
+      </Layout>
+    </>
   );
 };
 export default Article;

@@ -13,26 +13,31 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsDirectory = path.join(process.cwd(), 'articles');
   const filenames = fs.readdirSync(postsDirectory);
 
-  const unsortedArticles = filenames.map((filename) => {
+  const unsortedArticles: Array<{
+    date: Date;
+    title: string;
+    slug: string;
+  }> = filenames.map((filename) => {
     const filePath = path.join(postsDirectory, filename);
     const fileContents = fs.readFileSync(filePath, 'utf8');
     const { data } = matter(fileContents);
     return {
-      date: data.date,
+      date: new Date(data.date),
       title: data.title,
       slug: filename.replace(/.mdx$/, ''),
     };
   });
 
-  const articles = sortBy(unsortedArticles, ['date'])
-    .reverse()
-    .map((art) => ({
-      slug: art.slug,
-      date: format(new Date(art.date), 'd MMM yyyy', {
-        locale: fr,
-      }),
-      title: art.title,
-    }));
+  const articles = sortBy(
+    unsortedArticles,
+    (article) => -article.date.getTime()
+  ).map((art) => ({
+    slug: art.slug,
+    date: format(art.date, 'd MMM yyyy', {
+      locale: fr,
+    }),
+    title: art.title,
+  }));
 
   return {
     props: {
@@ -40,6 +45,10 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   };
 };
+
+const description =
+  'Blog personnel de Zaratan. Ce site me sert a poster mes opinions quand à la tech en général';
+const title = 'Zaratan@next';
 
 export default function Home({
   articles,
@@ -49,8 +58,13 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>Zaratan@next</title>
+        <title>{title}</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content={description} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
       </Head>
       <Layout>
         <ArticleList articles={articles} />

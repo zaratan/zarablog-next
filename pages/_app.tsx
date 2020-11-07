@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { useContext } from 'react';
 
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';
@@ -19,11 +20,19 @@ const WrappedApp = ({ Component, pageProps }: AppProps) => {
 
 function MyApp(appProps: AppProps) {
   return (
-    <ThemeContextProvider>
-      <LayoutProvider>
-        <WrappedApp {...appProps} />
-      </LayoutProvider>
-    </ThemeContextProvider>
+    <>
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+      </Head>
+      <ThemeContextProvider>
+        <LayoutProvider>
+          <WrappedApp {...appProps} />
+        </LayoutProvider>
+      </ThemeContextProvider>
+    </>
   );
 }
 

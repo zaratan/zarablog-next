@@ -2,9 +2,11 @@
 
 tt,
 code {
-  background-color: hsla(0, 0%, 0%, 0.04);
+  @include gthemed {
+    background-color: t("base2"); /* base3 */
+  }
   border-radius: 3px;
-  font-family: "SFMono-Regular", Consolas, "Roboto Mono", "Droid Sans Mono",
+  font-family: Inconsolata, Consolas, "Roboto Mono", "Droid Sans Mono",
     "Liberation Mono", Menlo, Courier, monospace;
   padding: 0;
   padding-top: 0.2em;
@@ -19,7 +21,7 @@ code:after,
 tt:before,
 tt:after {
   letter-spacing: -0.2em;
-  content: " ";
+  content: "";
 }
 pre code:before,
 pre code:after,
@@ -48,7 +50,7 @@ pre[class*="language-"] {
   -moz-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
-  @include themed {
+  @include gthemed {
     color: t("base1");
   }
 }
@@ -57,7 +59,7 @@ pre[class*="language-"]::-moz-selection,
 pre[class*="language-"] ::-moz-selection,
 code[class*="language-"]::-moz-selection,
 code[class*="language-"] ::-moz-selection {
-  @include themed {
+  @include gthemed {
     background: t("base02"); /* base02 */
     color: t("base2");
   }
@@ -67,7 +69,7 @@ pre[class*="language-"]::selection,
 pre[class*="language-"] ::selection,
 code[class*="language-"]::selection,
 code[class*="language-"] ::selection {
-  @include themed {
+  @include gthemed {
     background: t("base02"); /* base02 */
     color: t("base2");
   }
@@ -75,7 +77,7 @@ code[class*="language-"] ::selection {
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-  @include themed {
+  @include gthemed {
     background-color: t("base2"); /* base3 */
   }
 }
@@ -93,13 +95,13 @@ pre[class*="language-"] {
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  @include themed {
+  @include gthemed {
     color: t("base00"); /* base1 */
   }
 }
 
 .token.punctuation {
-  @include themed {
+  @include gthemed {
     color: t("base0"); /* base01 */
   }
 }
@@ -143,7 +145,7 @@ pre[class*="language-"] {
 
 .token.entity {
   cursor: help;
-  @include themed {
+  @include gthemed {
     color: t("base0"); /* base00 */
     background: t("base2"); /* base2 */
   }

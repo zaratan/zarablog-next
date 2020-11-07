@@ -63,7 +63,7 @@
     }
   }
   @media only screen and (max-width: 400px) {
-    max-width: 300px;
+    max-width: 300px !important;
   }
   .language-text {
     white-space: normal;

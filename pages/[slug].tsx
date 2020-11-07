@@ -7,7 +7,7 @@ import hydrate from 'next-mdx-remote/hydrate';
 import matter from 'gray-matter';
 import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
-import rehypePrism from '@mapbox/rehype-prism';
+import remarkPrism from 'remark-prism';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
@@ -25,8 +25,8 @@ export async function getStaticPaths() {
 }
 
 const components = {
-  FileName,
   Youtube,
+  FileName,
 };
 
 export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
@@ -36,7 +36,15 @@ export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
   const mdxSource = await renderToString(content, {
     components,
     mdxOptions: {
-      rehypePlugins: [rehypePrism],
+      rehypePlugins: [],
+      remarkPlugins: [
+        [
+          remarkPrism,
+          {
+            plugins: ['prismjs/plugins/line-numbers/prism-line-numbers'],
+          },
+        ],
+      ],
     },
     scope: data,
   });

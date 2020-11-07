@@ -29,14 +29,10 @@ class MyDocument extends Document {
           />
           <link
             rel="preload"
-            href="https://fonts.gstatic.com/s/inconsolata/v18/QldKNThLqRwH-OJ1UHjlKGlZ5qhExfHw.woff2"
+            href="https://fonts.gstatic.com/s/inconsolata/v20/QldgNThLqRwH-OJ1UHjlKENVzkWGVkL3GZQmAwLYxYWI2qfdm7Lpp4U8WR32kXWdycuJDA.woff"
             as="font"
             type="font/woff2"
             crossOrigin="anonymous"
-          />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
-            rel="stylesheet"
           />
           <meta property="og:type" content="website" />
           <meta name="twitter:card" content="summary" />

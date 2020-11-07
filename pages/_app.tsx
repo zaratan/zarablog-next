@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';
 import { LayoutProvider } from '../contexts/LayoutContext';
@@ -19,6 +19,14 @@ const WrappedApp = ({ Component, pageProps }: AppProps) => {
 };
 
 function MyApp(appProps: AppProps) {
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Inconsolata&display=swap';
+    link.rel = 'stylesheet';
+
+    document.head.appendChild(link);
+  });
   return (
     <>
       <Head>

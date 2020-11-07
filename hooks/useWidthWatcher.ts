@@ -13,7 +13,7 @@ export const useWidthWatcher = ({ wait } = { wait: 100 }) => {
   try {
     firstWidth = window.innerWidth;
   } catch (error) {
-    console.log("window object don't exist in SSR");
+    // window object don't exist in SSR
   }
   const [width, setWidth] = useState(firstWidth);
 

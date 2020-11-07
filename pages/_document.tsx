@@ -34,6 +34,10 @@ class MyDocument extends Document {
             type="font/woff2"
             crossOrigin="anonymous"
           />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
+            rel="stylesheet"
+          />
           <meta property="og:type" content="website" />
           <meta name="twitter:card" content="summary" />
           <meta name="twitter:creator" content="@zaratan" />

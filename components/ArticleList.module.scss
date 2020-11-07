@@ -29,7 +29,7 @@
   font-size: 16px;
   line-height: 1.25;
   letter-spacing: 0.39px;
-  &.inconsolataLoaded {
+  &:global(.inconsolata-loaded) {
     font-family: Inconsolata, Consolas, Monaco, monospace;
     font-size: 20px;
     line-height: 1;

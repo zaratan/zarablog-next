@@ -1,0 +1,67 @@
+---
+title: "NextJS Refactor: La stack."
+date: 2020-11-09T05:16:13+09:00
+categories:
+  - front
+  - code
+description: "Premier article d'une série sur les diverses techniques qui font tourner ce blog."
+---
+
+Cette série d'articles a pour but de présenter la stack front-end qui fait tourner ce blog et d'en profiter pour parler de diverses techniques que vous pourriez avoir envie d'utiliser.
+Ce premier article est purement introductif et va servir a ce que tout le monde s'y retrouve plus tard.
+
+Vous pouvez trouver le code du blog ici si ça vous intéresse: https://github.com/zaratan/zarablog-next
+
+## React
+
+[React](https://fr.reactjs.org) est un framework front qui permet de créer des sites web en JS. Ce framework simplifie la gestion de l'état du site/app et les interactions utilisateur.
+
+J'avais un peu présenté ça par le passé à deux reprises:
+
+- Un article un peu vieux maintenant: [React basics](./react-basics)
+- Une série de vidéos sur Youtube: [Browser Extension](https://www.youtube.com/playlist?list=PLT4YMsBCL8tI2gWds-o__SlwxLmty8fXL)
+
+## NextJS
+
+[NextJS](https://nextjs.org) est une "_fine_" sur-couche par dessus React qui gère certaines choses automatiquement.
+On aura l'occasion de revenir sur certains de ces points au cours des différents articles de cette série, mais en vrac ça gère:
+
+- Le routing
+- Le code spliting
+- La configuration Babel/Webpack/TypeScript
+- Plein d'optimisations pour React
+
+## Vercel
+
+[Vercel](http://vercel.com) est la compagnie qui produit NextJS.
+Auparavant appelée Zeit, son principal produit permet de:
+
+- Déployer facilement un projet Front
+- Déployer des routes de Serverless APIs
+- Gérer ses domaines DNS
+
+C'est avec ce produit que ce blog est déployé.
+
+## MDX
+
+Le [MDX](https://mdxjs.com) c'est comme le MarkDown mais étendu. Un des points majeurs qui est utile ici est qu'il supporte l'ajout de composants React.
+
+## TypeScript
+
+[TypeScript](https://www.typescriptlang.org) est un langage qui sera compilé vers le Javascript.
+Il ressemble trait pour trait au JS à la différence notoire qu'il ajoute un "_type_" au différentes choses (fonctions, paramètres, objects).
+Les types seront check à la compilation pour éviter certaines erreurs en prod.
+
+## Articles de la série
+
+- Comment charger une font proprement (à venir)
+- Comment gérer un thème clair/sombre (avec du scss) (à venir)
+- Colorisation syntaxique (à venir)
+- Travailler avec un budget (à venir)
+- CSS-in-JS avantages in inconvénients (à venir)
+- Outils de dev et déploiement (Eslint, etc…) (à venir)
+- Gérer des MDX (à venir)
+- Les pattern que j'utilise souvent en React (à venir)
+- Pourquoi et comment NextJS (à venir)
+- Pourquoi et comment TypeScript (à venir)
+- …

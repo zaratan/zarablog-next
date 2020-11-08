@@ -21,7 +21,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx", "components/Youtube.jsx"
   ],
   "exclude": [
     "node_modules"

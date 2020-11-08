@@ -5305,6 +5305,11 @@ listr2@^3.2.2:
     rxjs "^6.6.3"
     through "^2.3.8"
 
+lite-youtube-embed@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/lite-youtube-embed/-/lite-youtube-embed-0.1.2.tgz#b342935d1563b24043ac270046859b9ddfcbf57c"
+  integrity sha512-w/rbcTN3GDwaF1qSwRvCsZReln9TSiQY3kZubbAG0Lm6QmgYhvWM8UYPizC+5z6/lVtIO37ChX9vC8TeeKTp7A==
+
 load-json-file@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-2.0.0.tgz#7947e42149af80d696cbf797bcaabcfe1fe29ca8"

@@ -15,6 +15,7 @@
     "date-fns": "^2.16.1",
     "fontfaceobserver": "^2.1.0",
     "gray-matter": "^4.0.2",
+    "lite-youtube-embed": "^0.1.2",
     "lodash": "^4.17.20",
     "next": "10.0.0",
     "next-google-fonts": "^1.2.1",

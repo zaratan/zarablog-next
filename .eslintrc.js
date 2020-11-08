@@ -111,5 +111,5 @@ module.exports = {
     '@typescript-eslint/no-shadow': ['error'],
   },
   plugins: ['prettier', 'react-hooks', '@typescript-eslint'],
-  ignorePatterns: ['next-env.d.ts', 'node_modules/', '/public/prez'],
+  ignorePatterns: ['next-env.d.ts', 'node_modules/', '/public/'],
 };

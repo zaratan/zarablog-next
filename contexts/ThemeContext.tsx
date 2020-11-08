@@ -20,7 +20,7 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const lsDark = JSON.parse(localStorage.getItem('ThemeContext:isDark'));
     console.log({ lsDark });
-    if (lsDark !== undefined) {
+    if (lsDark !== undefined && lsDark !== null) {
       setIsDark(lsDark);
     }
   }, []);

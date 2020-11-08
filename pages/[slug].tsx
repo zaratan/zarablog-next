@@ -65,6 +65,7 @@ export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Article = ({ article }: { article: { mdx: any; data: any } }) => {
   const content = hydrate(article.mdx, {
     components,

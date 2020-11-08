@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import GoogleFonts from 'next-google-fonts';
 
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';

@@ -9,21 +9,59 @@ description: "Problématiques autour du chargement d'une font dans un site web e
 
 Cet article fait parti de la série sur ce blog en NextJS. L'introduction avec la liste des autres articles est disponible ici: [Intro](./next-refactor-intro).
 
+On va parler ici des fonts et de toutes les problématiques associées, comment on les résout.
+
+## La base: Comment utiliser une font en CSS
+
+<FileName filename="components/ArticleList.module.scss" line="28" blogGithub />
+
+```scss
+* {
+  font-family: Consolas, Monaco, monospace;
+}
+```
+
+Le navigateur va utiliser la première font de la liste (de gauche a droite) qu'il possède. Les font qui ne sont pas disponible seront ignorées
+
 ## Les différents types de font
+
+Il y a globalement 2 types de fonts.
+Celles qui sont déjà sur les ordinateurs des utilisateurs et celles qu'il faut aller chercher.
+Ces dernières ont plusieurs "saveurs" en fonction de là où elles viennent exactement.
 
 ### Font "de base"
 
+Chaque OS possède un sous-ensemble de font pré-installées. Ces fonts n'ont donc pas de temps de chargement et seront donc affichées instantanément.
+
+Malheureusement les fonts disponibles sur chaque OS diffère grandement et il faut donc souvent choisir des équivalents par OS.
+
+Par exemple, dans le code donnée précédemment:
+
+```scss
+* {
+  font-family: Consolas, Monaco, monospace;
+}
+```
+
+`Consolas` est seulement sur Windows, `Monaco` est seulement sous Mac et `monospace` est une famille de font qui sera utilisé dans les autres OS.
+
+Vous pouvez trouver [ici](https://www.cssfontstack.com) une liste des "safe-font" disponible par OS.
+Et sur wikipedia une liste a jour des fonts par OS: [Mac](https://en.wikipedia.org/wiki/List_of_typefaces_included_with_macOS) et [Windows](https://en.wikipedia.org/wiki/List_of_typefaces_included_with_Microsoft_Windows)
+
 ### Font Online
+
+Un certain nombre de font supplémentaires sont disponible Online. Il faudra donc les importer séparément dans son CSS et définir une nouvelle famille de font
+(Nous verrons les différentes façons de le faire plus bas)
 
 ### Font Custom locale
 
 ### Font Google
 
-## Les 2 endroits où charger sa font
+## Les 2 façons de charger sa font
 
-### Le head en tant que fichier a part
+### Avec un font-family
 
-### Dans son CSS
+### Avec un @import CSS
 
 ## La situation
 

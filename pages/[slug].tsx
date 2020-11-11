@@ -8,6 +8,7 @@ import matter from 'gray-matter';
 import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
 import remarkPrism from 'remark-prism';
+import Image from 'next/image';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
@@ -27,6 +28,7 @@ export async function getStaticPaths() {
 const components = {
   Youtube,
   FileName,
+  Image,
 };
 
 export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {

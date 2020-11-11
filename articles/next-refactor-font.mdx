@@ -43,7 +43,7 @@ Par exemple, dans le code donnée précédemment:
 }
 ```
 
-`Consolas` est seulement sur Windows, `Monaco` est seulement sous Mac et `monospace` est une famille de font qui sera utilisé dans les autres OS.
+`Consolas` est seulement disponible sur Windows, `Monaco` est seulement sous Mac et `monospace` est une famille de font qui sera utilisé dans les autres OS.
 
 Vous pouvez trouver [ici](https://www.cssfontstack.com) une liste des "safe-font" disponible par OS.
 Et sur wikipedia une liste a jour des fonts par OS: [Mac](https://en.wikipedia.org/wiki/List_of_typefaces_included_with_macOS) et [Windows](https://en.wikipedia.org/wiki/List_of_typefaces_included_with_Microsoft_Windows)
@@ -51,17 +51,125 @@ Et sur wikipedia une liste a jour des fonts par OS: [Mac](https://en.wikipedia.o
 ### Font Online
 
 Un certain nombre de font supplémentaires sont disponible Online. Il faudra donc les importer séparément dans son CSS et définir une nouvelle famille de font
-(Nous verrons les différentes façons de le faire plus bas)
+(Nous verrons les différentes façons de le faire plus bas).
+
+Il existe un certain nombre de format de font. Ce fut pendant longtemps un sujet complexe (Looking at you IE8).
+De nos jours, si vous ne devez pas supporter IE11 => [Woff2](https://caniuse.com/woff2) et si vous devez supporter IE11 => [Woff](https://caniuse.com/woff) et Woff2.
+C'est deux format ouverts et c'est supporté par quasiment tous les navigateurs utilisés (Toujours regarder le usage-relative dans caniuse.com).
+Woff2 étant un itération sur le format Woff qui offre une meilleure compression.
+
+Il existe des dizaines de sites qui vont servir de CDN pour des fonts. Par exemple [Adobe](https://fonts.adobe.com) et [fonts.com](https://www.fonts.com).
 
 ### Font Custom locale
 
+De nombreux sites proposent de télécharger directement les polices pour ensuite pouvoir les servir depuis votre site web.
+C'est comme une version "Online" classique sauf que c'est vous qui hébergez votre font.
+Eventuellement ça va impliquer devoir la servir depuis un CDN ou autre.
+Vous devriez traiter votre font comme une image critique pour votre site.
+
 ### Font Google
+
+[Google fonts](https://fonts.google.com) héberge un grand nombre de polices gratuites avec leur propre CDN.
+Vous devriez traiter ça comme une font online normale mais on va voir qu'il y a quelques différences quant à la façon qu'a Google de faire charger les fonts.
 
 ## Les 2 façons de charger sa font
 
 ### Avec un font-family
 
-### Avec un @import CSS
+N'importe où dans votre CSS vous pouvez ajouter une nouvelle famille de font disponible pour votre navigateur de la façon suivante:
+
+```css
+@font-face {
+  font-family: "MyCustomFont";
+  src: url("https://url.to.my.font.woff2") format("woff2"), url("https://url.to.my.font.woff")
+      format("woff");
+}
+```
+
+Et l'utiliser comme une font standard du système, par exemple:
+
+<FileName filename="components/ArticleList.module.scss" line="33" blogGithub />
+
+```css
+* {
+  font-family: Inconsolata, Consolas, Monaco, monospace;
+}
+```
+
+Ici, `Inconsolata` n'est pas une police de base et est téléchargée par le navigateur.
+
+### Que fait Google fonts ?
+
+Si on suit une url de google fonts ([https://fonts.googleapis.com/css2?family=Inconsolata](https://fonts.googleapis.com/css2?family=Inconsolata) par exemple) on voit que google sert un CSS qui contient des `font-face` pré-écrits qui couvrirons le range entier de la font:
+
+```css
+/* vietnamese */
+@font-face {
+  font-family: "Inconsolata";
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/inconsolata/v20/QldgNThLqRwH-OJ1UHjlKENVzkWGVkL3GZQmAwLYxYWI2qfdm7Lpp4U8WRL2kXWdycuJDETf.woff)
+    format("woff");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+    U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: "Inconsolata";
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/inconsolata/v20/QldgNThLqRwH-OJ1UHjlKENVzkWGVkL3GZQmAwLYxYWI2qfdm7Lpp4U8WRP2kXWdycuJDETf.woff)
+    format("woff");
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: "Inconsolata";
+  font-style: normal;
+  font-weight: 400;
+  font-stretch: 100%;
+  src: url(https://fonts.gstatic.com/s/inconsolata/v20/QldgNThLqRwH-OJ1UHjlKENVzkWGVkL3GZQmAwLYxYWI2qfdm7Lpp4U8WR32kXWdycuJDA.woff)
+    format("woff");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+```
+
+Donc pour utiliser une font Google ce que nous faisons réellement c'est 2 sauts/appels. Un premier pour télécharger le CSS avec les `@font-face` et **n** avec les différentes `src` de font.
+
+Google propose deux façons d'importer les fonts.
+
+- Avec un @import CSS
+
+```html
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inconsolata&display=swap");
+</style>
+```
+
+- Dans le html
+
+```html
+<link
+  href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
+  rel="stylesheet"
+/>
+```
+
+Les deux façons sont globalement équivalentes si et seulement si le `@import` est bien utilisé dans le head de votre html et pas dans un fichier tiers CSS.
+Si le import est mis dans un fichier CSS on se retrouve à faire un saut de plus:
+
+1. Aller chercher le CSS => se rendre compte qu'il y a un import d'un tiers
+2. Aller chercher le tiers chez google => se rendre compte qu'il demande de charger des polices
+3. Aller chercher des polices.
+
+Pendant ce temps, le reste de votre fichier CSS n'est pas appliqué à votre page web.
+
+Dans le doute, n'utilisez pas le `@import` et préférez le `<link>`
 
 ## La situation
 

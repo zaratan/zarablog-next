@@ -2,15 +2,23 @@ import { setMaxListeners } from 'process';
 import React from 'react';
 import styles from './FileName.module.scss';
 
+type FileType = { filename: string; line?: string } & (
+  | {
+      blogGithub?: false | undefined;
+      external: false | undefined;
+      baseUrl: undefined;
+    }
+  | { blogGithub: true; external: false | undefined; baseUrl: undefined }
+  | { blogGithub?: false | undefined; external: true; baseUrl: string }
+);
+
 const FileName = ({
   filename,
   line,
   blogGithub,
-}: {
-  filename: string;
-  line?: string;
-  blogGithub?: boolean;
-}) => {
+  external,
+  baseUrl,
+}: FileType) => {
   if (blogGithub) {
     return (
       <a
@@ -18,6 +26,16 @@ const FileName = ({
         href={`https://github.com/zaratan/zarablog-next/blob/main/${filename}${
           line ? `#L${line}` : ''
         }`}
+      >
+        {filename}:{line}
+      </a>
+    );
+  }
+  if (external) {
+    return (
+      <a
+        className={styles.fileName}
+        href={`${baseUrl}${filename}${line ? `#L${line}` : ''}`}
       >
         {filename}:{line}
       </a>

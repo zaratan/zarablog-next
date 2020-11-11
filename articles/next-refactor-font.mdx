@@ -183,9 +183,84 @@ La plupart du temps, la police peut être appliquée dans un second temps sans q
 
 ##### Ce CSS doit il être bloquant ?
 
+Déjà il faut se poser la question principale, est-ce que votre font est si importante qu'elle doit bloquer tout le chargement de votre site web ?
+Personnellement je ne vois que très très peu de cas où c'est éventuellement sujet à débat.
+Le cas d'un logo qui est un texte avec une font particulière par exemple me vient à l'esprit.
+Mais même dans ce cas ça ne serait pas un oui automatique.
+
 ##### La technique de média
 
-##### Le cas spécial de NextJS
+Cette technique marche pour tout CSS qui sera "non-obligatoire" pour charger un site et pas seulement dans le cas d'un chargement de police.
+
+Prenons un lien de chargement d'un fichier CSS:
+
+```html
+<link
+  href="https://fonts.googleapis.com/css2?family=Inconsolata"
+  rel="stylesheet"
+/>
+```
+
+Dès que la page va rencontrer ce lien elle va charger le CSS à l'URL indiqué et l'intégrer dans son premier rendu.
+Ceci est du au fait que le navigateur "sait quoi faire" du fichier.
+
+Un des attributs supplémentaires qu'on peut passer à un link est: `media` Je cite la paraphrase [MDN](https://developer.mozilla.org/fr/docs/Web/HTML/Element/link#Attributs):
+
+> Cet attribut indique le média auquel s'applique la ressource liée. Sa valeur doit être une requête média. Cet attribut est principalement utilisé pour permettre à l'agent utilisateur de sélectionner la meilleure feuille de style en fonction de l'appareil de l'utilisateur.
+
+Les [valeurs valide d'une requête media](https://developer.mozilla.org/fr/docs/Web/CSS/Requêtes_média/Utiliser_les_Media_queries#Syntaxe) sont: `all`, `print`, `screen` et `speech`.
+
+Mais que se passe-t-il quand un media non-valide est spécifié ? Le fichier est chargé mais non exécuté (car le media ne correspond pas au media courant) et donc **n'est pas bloquant**.
+
+```html
+<link
+  href="https://fonts.googleapis.com/css2?family=Inconsolata"
+  rel="stylesheet"
+  media="nope"
+/>
+```
+
+Vous me direz qu'on est bien avancé. C'est sûr qu'on a plus de CSS bloquant mais le fichier n'est pas chargé donc on a l'air malin. Vous auriez raison.
+
+Cependant, il existe un autre type d'attribut qu'on peut utiliser: `onload` qui exécutera du `JS` quand le fichier sera chargé.
+JS qu'on va utiliser pour changer la valeur de `media` vers quelque-chose de valide.
+
+```html
+<link
+  href="https://fonts.googleapis.com/css2?family=Inconsolata"
+  rel="stylesheet"
+  media="nope"
+  onload="if(media!='all')media='all'"
+/>
+```
+
+On a donc maintenant un fichier CSS qui sera chargé dans le site de manière non-bloquante.
+
+##### Le cas spécial de NextJS + Google
+
+NextJS n'aime pas trop qu'on manipule la balise `onload` d'un link dans le `<head>`. Il existe un package `npm` pour charger des fonts Google utilisant cette technique de media:
+[next-google-fonts](https://github.com/joe-bell/next-google-fonts).
+
+Si on regarde dans le code source on peut trouver une variation de cette technique à la sauce React :
+
+<FileName
+  external
+  baseUrl="https://github.com/joe-bell/next-google-fonts/blob/9d57977fa5e1cdfe7b72826913757142eb91443b/packages/"
+  filename="next-google-fonts/src/index.tsx"
+  line="35"
+/>
+
+```tsx
+<link href={href} rel="stylesheet" media={!hydrated ? "print" : "all"} />
+```
+
+On utilise le package de cette façon dans NextJS:
+
+<FileName blogGithub filename="pages/_app.tsx" line="25" />
+
+```tsx
+<GoogleFonts href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" />
+```
 
 ### La UI qui ne s'affiche pas avant que la font soit chargée
 
@@ -215,7 +290,7 @@ Que vous soyez FOUT ou FOIT, le moins de temps l'utilisateur passe avec une UI n
 
 Et finalement, si vous avez choisi d'opter pour le FOUT (ce qui a mon humble avis devrait être le choix par défaut),
 vous aller remarquer que la police "système" et la police finale font différentes tailles.
-Ça va impliquer qu'après le chargement de votre police finale la texte voir le layout de la page risque de bouger et perturber la lecture et/ou le rendu.
+Ça va impliquer qu'après le chargement de votre police finale le texte voir le layout de la page risque de bouger et perturber la lecture et/ou le rendu.
 
 ### Overlapping fonts
 
@@ -223,4 +298,4 @@ vous aller remarquer que la police "système" et la police finale font différen
 
 ## Conclusion
 
-Ne négligez pas vos fonts c'est une façon facile de gagner en performance et en usabilité avec quelques techniques _in-fine_ assez simples.
+Ne négligez pas vos fonts c'est une façon facile de gagner en performance et en utilisabilité avec quelques techniques _in-fine_ assez simples.

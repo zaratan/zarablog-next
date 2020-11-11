@@ -171,38 +171,56 @@ Pendant ce temps, le reste de votre fichier CSS n'est pas appliqué à votre pag
 
 Dans le doute, n'utilisez pas le `@import` et préférez le `<link>`
 
-## La situation
+## Les problématiques
+
+Tout ça étant dit, vous allez rencontrer 4 problématiques majeures avec l'utilisation d'une font qui n'est pas présente nativement.
 
 ### Blocking CSS
 
+Si vous utilisez une font custom, votre site ne sera pas considéré comme "chargé" avant que la font ne soit téléchargée et appliquée.
+Sur un ordinateur connecté a votre fibre ce n'est pas un problème mais c'est une toute autre histoire sur un mobile de 2010 connecté à du edge chancelant.
+La plupart du temps, la police peut être appliquée dans un second temps sans que ça gène l'utilisation du site.
+
+##### Ce CSS doit il être bloquant ?
+
+##### La technique de média
+
+##### Le cas spécial de NextJS
+
 ### La UI qui ne s'affiche pas avant que la font soit chargée
+
+En fonction de comment vous déclarez votre `@font-face` le texte ayant cette police peut:
+
+- Soit ne pas s'afficher du tout tant que la police n'est pas chargé, ce qui peut faire un site inutilisable;
+- Soit changer quand la police est chargée ce qui peut faire un changement de police alors que l'utilisateur a commencé à lire votre article.
+
+En tant que développeur on a donc le choix entre le FOUT (Flash of unstyled text) ou le FOIT (Flash of invisible text) le temps qu'une police soit chargé.
+Cet [article](https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/) en parle très bien et je vais essayer de résumer tout ça.
+
+##### Les différents type de chargement de font
+
+##### Comment le mettre en place avec les différentes localisation de font ?
 
 ### Slow
 
+Dans tous les cas, charger une font c'est "lent".
+La rapidité avec laquelle votre front va charger votre police va impacter l'expérience utilisateur.
+Que vous soyez FOUT ou FOIT, le moins de temps l'utilisateur passe avec une UI non-finale le mieux c'est.
+
+##### Préchargement des fonts
+
+##### Le cas spécial de Google
+
 ### Shift de la UI post chargement
 
-## Blocking CSS
-
-### Ce CSS doit il être bloquant ?
-
-### La technique de média
-
-## La UI qui ne s'affiche pas avant la font
-
-### Les différents type de chargement de font
-
-### Comment le mettre en place avec les différentes localisation de font ?
-
-## Slow
-
-### Préchargement des fonts
-
-### Le cas spécial de Google
-
-## Le shift de la UI
+Et finalement, si vous avez choisi d'opter pour le FOUT (ce qui a mon humble avis devrait être le choix par défaut),
+vous aller remarquer que la police "système" et la police finale font différentes tailles.
+Ça va impliquer qu'après le chargement de votre police finale la texte voir le layout de la page risque de bouger et perturber la lecture et/ou le rendu.
 
 ### Overlapping fonts
 
 ### Detect font loading
 
 ## Conclusion
+
+Ne négligez pas vos fonts c'est une façon facile de gagner en performance et en usabilité avec quelques techniques _in-fine_ assez simples.

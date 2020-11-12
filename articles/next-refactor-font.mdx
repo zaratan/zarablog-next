@@ -308,7 +308,53 @@ Que vous soyez FOUT ou FOIT, le moins de temps l'utilisateur passe avec une UI n
 
 ##### Préchargement des fonts
 
-##### Le cas spécial de Google
+Il existe une option pour dire a votre navigateur de charger aussi vite que possible un fichier CSS (on le marque comme critique): `rel="preload"`
+
+Par exemple:
+
+```html
+<link
+  rel="preload"
+  href="Inconsolata.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+```
+
+Ça a comme défaut que si vous n'utilisez pas la technique de media vue plus haut. Ce chargement devient VRAIMENT bloquant pour votre page.
+
+##### Le cas spécial de Google fonts
+
+Comme on l'a vu Google fonts fait un saut et ne nous laisse pas vraiment charger les fonts comme on veut. Mais on peut tout de même utiliser cette technique avec quelques variations:
+
+On commence par se préconnecter aussi tôt que possible dans notre html a `fonts.gstatic.com` ce qui réduit autant que possible le temps de négociation SSL pour les différentes polices qui seront chargées.
+
+```html
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin="anonymous"
+/>
+```
+
+Puis on va preload le fichier CSS correspondant:
+
+```html
+<link
+  rel="preload"
+  href="https://fonts.googleapis.com/css?family=Inconsolata&display=swap"
+/>
+```
+
+Si vous utilisez la librairie `next-google-fonts`, ces étapes sont faites automatiquement:
+
+<FileName
+  external
+  baseUrl="https://github.com/joe-bell/next-google-fonts/blob/9d57977fa5e1cdfe7b72826913757142eb91443b/packages/"
+  filename="next-google-fonts/src/index.tsx"
+  line="29-34"
+/>
 
 ### Shift de la UI post chargement
 
@@ -318,7 +364,9 @@ vous aller remarquer que la police "système" et la police finale font différen
 
 ##### Overlapping fonts
 
-[Overlap tool](https://meowni.ca/font-style-matcher/)
+La technique va être d'appliquer un CSS différent en fonction de si la police finale est chargée ou non.
+
+Il existe pour ça un super outil: [Overlap tool](https://meowni.ca/font-style-matcher/)
 
 <Image
   src="/articles/next-refactor-font/default-font.png"
@@ -326,6 +374,9 @@ vous aller remarquer que la police "système" et la police finale font différen
   height="330"
   width="1400"
 />
+
+Par défaut `monospace` et `Inconsolata` ne prennent pas du tout le même espace.
+
 <Image
   src="/articles/next-refactor-font/ajusted-font.png"
   alt="Ajusted fonts that shows clear overlapping"
@@ -333,8 +384,110 @@ vous aller remarquer que la police "système" et la police finale font différen
   width="1430"
 />
 
-##### Detect font loading
+Après ajustement on peut les faire coïncider presque parfaitement.
+
+Dans ce blog les deux ensemble de valeurs qu'on utilisera sont:
+
+Sans Inconsolata:
+
+<FileName
+  blogGithub
+  filename="components/ArticleList.module.scss"
+  line="29-31"
+/>
+
+```scss
+* {
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: 0.39px;
+}
+```
+
+Avec Inconsolata:
+
+<FileName
+  blogGithub
+  filename="components/ArticleList.module.scss"
+  line="34-36"
+/>
+
+```scss
+* {
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+```
+
+Le switch d'un CSS a un autre sera effectué avec du JS. Soit avec des choses comme [https://github.com/typekit/webfontloader](https://github.com/typekit/webfontloader).
+
+Soit beaucoup plus simple en React en utilisant : [fontfaceobserver](https://github.com/bramstein/fontfaceobserver).
+
+Votre serviteur (moi) vous propose même un hook pour facilement empaqueter la logique:
+
+<FileName blogGithub filename="hooks/useWatchFont.ts" />
+
+```ts
+import { useEffect, useState } from "react";
+import FontFaceObserver from "fontfaceobserver";
+
+const useWatchFont = (fontName: string) => {
+  const [fontLoaded, setFontLoaded] = useState(false);
+  useEffect(() => {
+    const fontObserver = new FontFaceObserver(fontName);
+    fontObserver.load().then(() => setFontLoaded(true));
+  }, [fontName]);
+
+  return fontLoaded;
+};
+
+export default useWatchFont;
+```
+
+Qu'on utilisera de la manière suivante:
+
+<FileName filename="components/ArticleList.tsx" blogGithub line="15-30" />
+
+```tsx
+const isInconsolataLoaded = useWatchFont("Inconsolata");
+const inconsolataLoadedClass = isInconsolataLoaded ? "inconsolata-loaded" : "";
+// …
+<a className={inconsolataLoadedClass} />;
+// …
+```
+
+et
+
+<FileName
+  filename="components/ArticleList.module.scss"
+  blogGithub
+  line="28-37"
+/>
+
+```scss
+* {
+  font-family: Consolas, Monaco, monospace;
+  font-size: 16px;
+  line-height: 1.25;
+  letter-spacing: 0.39px;
+  &:global(.inconsolata-loaded) {
+    font-family: Inconsolata, Consolas, Monaco, monospace;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+}
+```
 
 ## Conclusion
 
 Ne négligez pas vos fonts c'est une façon facile de gagner en performance et en utilisabilité avec quelques techniques _in-fine_ assez simples.
+
+## Pour aller plus loin quelques liens en vrac
+
+- [https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/](https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/)
+- [https://css-tricks.com/developing-a-robust-font-loading-strategy-for-css-tricks/](https://css-tricks.com/developing-a-robust-font-loading-strategy-for-css-tricks/)
+- [https://www.zachleat.com/web/comprehensive-webfonts/](https://www.zachleat.com/web/comprehensive-webfonts/)
+- [https://www.zachleat.com/web/css-tricks-web-fonts/](https://www.zachleat.com/web/css-tricks-web-fonts/)
+- [https://font-display.glitch.me](https://font-display.glitch.me)

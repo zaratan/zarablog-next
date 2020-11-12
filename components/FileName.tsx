@@ -20,11 +20,15 @@ const FileName = ({
   baseUrl,
 }: FileType) => {
   if (blogGithub) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+    const [_match, startLine, _endlinePres, endLine] = /(\d+)(-(\d+))?/.exec(
+      line || ''
+    ) || [null, null, null, null];
     return (
       <a
         className={styles.fileName}
         href={`https://github.com/zaratan/zarablog-next/blob/main/${filename}${
-          line ? `#L${line}` : ''
+          startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
         }`}
       >
         {filename}:{line}
@@ -32,10 +36,16 @@ const FileName = ({
     );
   }
   if (external) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+    const [_match, startLine, _endlinePres, endLine] = /(\d+)(-(\d+))?/.exec(
+      line || ''
+    ) || [null, null, null, null];
     return (
       <a
         className={styles.fileName}
-        href={`${baseUrl}${filename}${line ? `#L${line}` : ''}`}
+        href={`${baseUrl}${filename}${
+          startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
+        }`}
       >
         {filename}:{line}
       </a>

@@ -23,10 +23,6 @@ class MyDocument extends Document {
             name="google-site-verification"
             content="NRxEEOcQFFgZsHEu39yfQ2UJUX69eNfZof1JrPybwlo"
           />
-          <link
-            rel="preconnect"
-            href="https://fonts.googleapis.com/css?family=Inconsolata&amp;display=swap"
-          />
           <meta property="og:type" content="website" />
           <meta name="twitter:card" content="summary" />
           <meta name="twitter:creator" content="@zaratan" />

@@ -33,9 +33,9 @@ Ces dernières ont plusieurs "saveurs" en fonction de là où elles viennent exa
 
 Chaque OS possède un sous-ensemble de font pré-installées. Ces fonts n'ont donc pas de temps de chargement et seront donc affichées instantanément.
 
-Malheureusement les fonts disponibles sur chaque OS diffère grandement et il faut donc souvent choisir des équivalents par OS.
+Malheureusement les fonts disponibles sur chaque OS diffèrent grandement et il faut donc souvent choisir des équivalents par OS.
 
-Par exemple, dans le code donnée précédemment:
+Par exemple, dans le code donné précédemment:
 
 ```scss
 * {
@@ -50,7 +50,7 @@ Et sur wikipedia une liste a jour des fonts par OS: [Mac](https://en.wikipedia.o
 
 ### Font Online
 
-Un certain nombre de font supplémentaires sont disponible Online. Il faudra donc les importer séparément dans son CSS et définir une nouvelle famille de font
+Un certain nombre de font supplémentaires sont disponibles Online. Il faudra donc les importer séparément dans son CSS et définir une nouvelle famille de font
 (Nous verrons les différentes façons de le faire plus bas).
 
 Il existe un certain nombre de format de font. Ce fut pendant longtemps un sujet complexe (Looking at you IE8).
@@ -65,7 +65,7 @@ Par exemple [Adobe](https://fonts.adobe.com) et [fonts.com](https://www.fonts.co
 
 De nombreux sites proposent de télécharger directement les polices pour ensuite pouvoir les servir depuis votre site web.
 C'est comme une version "Online" classique sauf que c'est vous qui hébergez votre font.
-Eventuellement ça va impliquer devoir la servir depuis un CDN configuré par vos soins ou avec le reste de votre site web.
+Eventuellement ça va impliquer de devoir la servir depuis un CDN configuré par vos soins ou avec le reste de votre site web.
 Comme le chargement d'une font va forcement impliquer du désagrément pour votre utilisateur, vous devriez traiter votre font comme une image critique pour votre site.
 
 ### Font Google
@@ -101,7 +101,7 @@ Ici, `Inconsolata` n'est pas une police de base et est téléchargée par le nav
 
 ### Que fait Google fonts ?
 
-Si on suit une url de google fonts ([https://fonts.googleapis.com/css2?family=Inconsolata](https://fonts.googleapis.com/css2?family=Inconsolata) par exemple) on voit que google sert un CSS qui contient des `font-face` pré-écrits qui couvrirons le range entier de la font:
+Si on suit une url de google fonts ([https://fonts.googleapis.com/css2?family=Inconsolata](https://fonts.googleapis.com/css2?family=Inconsolata) par exemple) on voit que google sert un CSS qui contient des `font-face` pré-écrites qui couvriront le range entier de la font:
 
 ```css
 /* vietnamese */
@@ -267,7 +267,7 @@ On utilise le package de cette façon dans NextJS:
 
 En fonction de comment vous déclarez votre `@font-face` le texte ayant cette police peut:
 
-- Soit ne pas s'afficher du tout tant que la police n'est pas chargé, ce qui peut faire un site inutilisable;
+- Soit ne pas s'afficher du tout tant que la police n'est pas chargée, ce qui peut faire un site inutilisable;
 - Soit changer quand la police est chargée ce qui peut faire un changement de police alors que l'utilisateur a commencé à lire votre article.
 
 En tant que développeur on a donc le choix entre le FOUT (Flash of unstyled text) ou le FOIT (Flash of invisible text) le temps qu'une police soit chargé.

@@ -21,7 +21,7 @@ On va parler ici des fonts et de toutes les problématiques associées, comment 
 }
 ```
 
-Le navigateur va utiliser la première font de la liste (de gauche a droite) qu'il possède. Les font qui ne sont pas disponible seront ignorées
+Le navigateur va utiliser la première font de la liste (de gauche a droite) qu'il possède. Les font qui ne sont pas disponible seront ignorées.
 
 ## Les différents types de font
 
@@ -55,24 +55,25 @@ Un certain nombre de font supplémentaires sont disponible Online. Il faudra don
 
 Il existe un certain nombre de format de font. Ce fut pendant longtemps un sujet complexe (Looking at you IE8).
 De nos jours, si vous ne devez pas supporter IE11 => [Woff2](https://caniuse.com/woff2) et si vous devez supporter IE11 => [Woff](https://caniuse.com/woff) et Woff2.
-C'est deux format ouverts et c'est supporté par quasiment tous les navigateurs utilisés (Toujours regarder le usage-relative dans caniuse.com).
+C'est deux format ouverts et c'est supporté par quasiment tous les navigateurs utilisés (Toujours regarder le usage-relative dans [caniuse.com](caniuse.com)).
 Woff2 étant un itération sur le format Woff qui offre une meilleure compression.
 
-Il existe des dizaines de sites qui vont servir de CDN pour des fonts. Par exemple [Adobe](https://fonts.adobe.com) et [fonts.com](https://www.fonts.com).
+Il existe des dizaines de sites proposent des fonts (payantes ou non) et qui vont servir de CDN pour celles-ci.
+Par exemple [Adobe](https://fonts.adobe.com) et [fonts.com](https://www.fonts.com).
 
 ### Font Custom locale
 
 De nombreux sites proposent de télécharger directement les polices pour ensuite pouvoir les servir depuis votre site web.
 C'est comme une version "Online" classique sauf que c'est vous qui hébergez votre font.
-Eventuellement ça va impliquer devoir la servir depuis un CDN ou autre.
-Vous devriez traiter votre font comme une image critique pour votre site.
+Eventuellement ça va impliquer devoir la servir depuis un CDN configuré par vos soins ou avec le reste de votre site web.
+Comme le chargement d'une font va forcement impliquer du désagrément pour votre utilisateur, vous devriez traiter votre font comme une image critique pour votre site.
 
 ### Font Google
 
 [Google fonts](https://fonts.google.com) héberge un grand nombre de polices gratuites avec leur propre CDN.
 Vous devriez traiter ça comme une font online normale mais on va voir qu'il y a quelques différences quant à la façon qu'a Google de faire charger les fonts.
 
-## Les 2 façons de charger sa font
+## Les façons de charger sa font
 
 ### Avec un font-family
 
@@ -204,7 +205,7 @@ Prenons un lien de chargement d'un fichier CSS:
 Dès que la page va rencontrer ce lien elle va charger le CSS à l'URL indiqué et l'intégrer dans son premier rendu.
 Ceci est du au fait que le navigateur "sait quoi faire" du fichier.
 
-Un des attributs supplémentaires qu'on peut passer à un link est: `media` Je cite la paraphrase [MDN](https://developer.mozilla.org/fr/docs/Web/HTML/Element/link#Attributs):
+Un des attributs supplémentaires qu'on peut passer à un link est: `media` Je cite [MDN](https://developer.mozilla.org/fr/docs/Web/HTML/Element/link#Attributs):
 
 > Cet attribut indique le média auquel s'applique la ressource liée. Sa valeur doit être une requête média. Cet attribut est principalement utilisé pour permettre à l'agent utilisateur de sélectionner la meilleure feuille de style en fonction de l'appareil de l'utilisateur.
 
@@ -273,6 +274,31 @@ En tant que développeur on a donc le choix entre le FOUT (Flash of unstyled tex
 Cet [article](https://css-tricks.com/loading-web-fonts-with-the-web-font-loader/) en parle très bien et je vais essayer de résumer tout ça.
 
 ##### Les différents type de chargement de font
+
+Pour choisir son type de chargement de font dans un `@font-face` on va utiliser la propriété [font-display](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display).
+
+Elle a plusieurs valeurs possibles :
+
+- `auto`: La valeur par défaut. On laisse le navigateur décider. C'est a priori toujours un mauvais choix car on veut maitriser l'expérience du chargement de notre font. On peut avoir droit a un FOIT ou un FOUT avec un timeout long (30 secondes dans les vieux safari IOS) sans le savoir.
+- `block`: Une "courte" période de texte invisible. Suivit d'un fallback si la font n'est toujours pas chargée. Et dès que la font est chargée on l'affiche. La durée de la période dépend du navigateur et c'est en général **3 secondes** => Non. Personne ne veut attendre 3 secondes pour éventuellement pouvoir lire son texte.
+- `swap`: Pas de période de texte invisible, la police de fallback est tout de suite affichée et éventuellement sera remplacée par la font finale quand elle aura chargé.
+- `fallback`: 100ms de texte invisible, puis fallback et dès que la font est chargé on échange pour celle-ci. A mon sens c'est un "meilleur" `block`.
+- `optional`: Le browser a 100ms de texte invisible pour charger la font sinon le fallback sera utilisé pour toujours.
+
+<Image
+  src="/articles/next-refactor-font/font-display-compare.png"
+  alt="Graphique montrant les différents comportements des options de font-display"
+  height="1502"
+  width="2672"
+/>
+
+Cet [article](https://font-display.glitch.me) en plus d'être très bien offre un graphisme
+qui permet de bien se représenter les différentes options qu'on a.
+
+Si vous chargez votre font depuis Google fonts. Il y a un paramètre passable dans l'url qui fait que le CSS généré par Google aura le bon font display.
+Exemple: [https://fonts.googleapis.com/css2?family=Inconsolata&display=swap](https://fonts.googleapis.com/css2?family=Inconsolata&display=swap).
+
+À mon humble avis, vous voudrez quasiment toujours `swap`. Mais c'est toujours bien de savoir qu'il existe d'autres options.
 
 ### Slow
 

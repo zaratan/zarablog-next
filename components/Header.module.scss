@@ -135,6 +135,7 @@
   transition: top 0.3s ease-in-out;
   position: fixed;
   top: -50px;
+  z-index: 1;
 
   &:global(.visible) {
     top: 0;

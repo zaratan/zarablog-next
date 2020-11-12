@@ -31,7 +31,8 @@ const FileName = ({
           startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
         }`}
       >
-        {filename}:{line}
+        {filename}
+        {line ? `:${line}` : ''}
       </a>
     );
   }
@@ -47,13 +48,15 @@ const FileName = ({
           startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
         }`}
       >
-        {filename}:{line}
+        {filename}
+        {line ? `:${line}` : ''}
       </a>
     );
   }
   return (
     <span className={styles.fileName}>
-      {filename}:{line}
+      {filename}
+      {line ? `:${line}` : ''}
     </span>
   );
 };

@@ -9,19 +9,27 @@ description: "Comment facilement gérer son theme clair/sombre en SCSS + React"
 
 ## Contexte
 
-Un des trends actuel veut que l'on propose une version claire et une version sombre de nos sites à contenu textuel. 
+Un des trends actuel veut que l'on propose une version claire et une version sombre de nos sites à contenu textuel.
 En effet, certains utilisateurs préfèrent l'un où l'autre pour des questions de lisibilité.
 On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS mais une partie de l'article, nottament le bout sur le scss s'appliquerait en dehors de ce contexte.
 
-## Thème CSS the right way
+## Thème SCSS the right way
 
-### The dream way
+On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes:
+
+- Avoir un fichier scss différent par thème. C'est globalement bien si votre css fait moins de 100 lignes. Plus que ça et c'est le suicide assuré au moindre changement.
+- Importer et set des variables CSS différentes en fonction du thème. Vous trouverez un excelent example [ici](https://www.freecodecamp.org/news/how-to-easily-create-themes-with-css-variables-2d0f4cfa5b9a/). C'est franchement une solution tout à fait valide. L'interprétation du CSS sera plus longue car l'utilisation des variables se fera coté client. Les variable CSS ne sont pas vraiment agréable à écrire non plus.
+-
+
+###
 
 ### Ajoutons du SCSS
 
 ## Refactor avec des fonctions SCSS
 
 ## React + NextJS tooling
+
+### Context
 
 ### Mega class
 
@@ -31,4 +39,4 @@ On va voir dans cet article une façon de gérer ça dans un contexte React et N
 
 Pour aller plus loin:
 
--
+- [https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995)

@@ -19,13 +19,152 @@ On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes:
 
 - Avoir un fichier scss différent par thème. C'est globalement bien si votre css fait moins de 100 lignes. Plus que ça et c'est le suicide assuré au moindre changement.
 - Importer et set des variables CSS différentes en fonction du thème. Vous trouverez un excelent example [ici](https://www.freecodecamp.org/news/how-to-easily-create-themes-with-css-variables-2d0f4cfa5b9a/). C'est franchement une solution tout à fait valide. L'interprétation du CSS sera plus longue car l'utilisation des variables se fera coté client. Les variable CSS ne sont pas vraiment agréable à écrire non plus.
--
+- Avoir une fonction utilitaire permettant de généreren double tous les bouts qui sont dépendants du thème. C'est la méthode que je vais expliciter dans cet article.
 
-###
+### Version haut niveau de ce qu'on veut
 
-### Ajoutons du SCSS
+On veut que notre scss final ressemble autant que possible à:
+
+```scss
+div {
+  color: $grey;
+}
+```
+
+Ce qui va générer:
+
+```css
+.light-theme div {
+  color: #123456;
+}
+
+.dark-theme div {
+  color: #fedcba;
+}
+```
+
+Ça va permettre de générer un CSS final au moment du build, le minifier et le passer à l'utilisateur.
+
+Notre solution sera basée sur cet [article](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995) adapté à React, aux modules CSS et à leur implémentation dans NextJS.
+
+### Theme scss
+
+Commençons par définir un jeu de couleurs dans un partial SCSS :
+
+<FileName filename="styles/_theme.scss" line="1-31" blogGithub />
+
+```scss
+// Variables dépendants du thème
+$themes: (
+  "dark": (
+    base0: #839496,
+    base1: #93a1a1,
+    base2: #073642,
+    base3: #002b36,
+    base00: #657b83,
+    base01: #586e75,
+    base02: #eee8d5,
+    base03: #fdf6e3,
+  ),
+  "light": (
+    base0: #657b83,
+    base1: #586e75,
+    base2: #eee8d5,
+    base3: #fdf6e3,
+    base00: #839496,
+    base01: #93a1a1,
+    base02: #073642,
+    base03: #002b36,
+  ),
+);
+
+// Couleurs et autres variables communes
+$yellow: #b58900;
+$orange: #cb4b16;
+$red: #dc322f;
+$magenta: #d33682;
+$violet: #6c71c4;
+$blue: #268bd2;
+$cyan: #2aa198;
+$green: #859900;
+```
+
+Et pour utiliser ce fichier:
+
+```scss
+@import "path/to/theme";
+
+div {
+  color: $orange;
+}
+
+.light-theme {
+  div {
+    background-color: map-get(map-get($themes, "light"), "base1");
+  }
+}
+
+.dark-theme {
+  div {
+    background-color: map-get(map-get($themes, "dark"), "base1");
+  }
+}
+```
+
+Bon… Conceptuellement c'est très beau mais c'est pas vraiment pratique.
 
 ## Refactor avec des fonctions SCSS
+
+On va donc se créer des petits utilitaires scss pour simplifier et automatiser tout ça.
+
+<FileName filename="styles/_theme.scss" line="52-73" blogGithub />
+
+```scss
+// génère un nouveau mixin nommé themed. L'idée est que toutes les règles css définie à l'interieur seront dupliquée en dark et light.
+@mixin themed() {
+  // pour chaque thème défini dans la variable $themes
+  @each $theme, $map in $themes {
+    // défini une nouveau matcher .theme--nomdutheme le-matcheur-courant
+    .theme--#{$theme} & {
+      // defini une variable globale contenant un hash de toutes les valeurs courantes du theme
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
+      }
+      // execute le contenu original du mixin
+      @content;
+      // supprime la variable globale
+      $theme-map: null !global;
+    }
+  }
+}
+
+// Nouvelle fonction t qui va aller lire la valeur de la clé dans le hash temporaire défini par le mixin
+@function t($key: "base0") {
+  @return map-get($theme-map, $key);
+}
+```
+
+Si on refactor notre scss précédent:
+
+```scss
+@import "path/to/theme";
+
+div {
+  color: $orange;
+  @include themed {
+    background-color: t("base1");
+  }
+}
+```
+
+On a donc maintenant une version facile à utiliser.
 
 ## React + NextJS tooling
 

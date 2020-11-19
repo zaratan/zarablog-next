@@ -22,6 +22,11 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
     console.log({ lsDark });
     if (lsDark !== undefined && lsDark !== null) {
       setIsDark(lsDark);
+    } else if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: light)').matches
+    ) {
+      setIsDark(false);
     }
   }, []);
 

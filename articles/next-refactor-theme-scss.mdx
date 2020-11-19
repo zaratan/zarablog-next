@@ -23,6 +23,9 @@ On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes:
 
 ### Version haut niveau de ce qu'on veut
 
+On veut appliquer une classe à un élément assez haut de notre arborescence de DOM (si possible `<body>`) pour indiquer quel theme est actuellement utilisée.
+Ici j'ai choisi d'appeller ces classes `theme--nomDuTheme`.
+
 On veut que notre scss final ressemble autant que possible à:
 
 ```scss
@@ -34,11 +37,11 @@ div {
 Ce qui va générer:
 
 ```css
-.light-theme div {
+.theme--light div {
   color: #123456;
 }
 
-.dark-theme div {
+.theme--dark div {
   color: #fedcba;
 }
 ```
@@ -98,13 +101,13 @@ div {
   color: $orange;
 }
 
-.light-theme {
+.theme--light {
   div {
     background-color: map-get(map-get($themes, "light"), "base1");
   }
 }
 
-.dark-theme {
+.theme--dark {
   div {
     background-color: map-get(map-get($themes, "dark"), "base1");
   }
@@ -175,7 +178,76 @@ On a donc maintenant une version facile à utiliser.
 Bon c'est bien cool, on a un CSS qui est généré avec une version par thème.
 On va maintenant orchestrer le switch en React/NextJS.
 
-### Context
+### React: Context et Local Storage
+
+Tout d'abord on va rendre le choix du style accessible de façon globale avec un contexte.
+
+Nottez que ceci est du typescript et qu'il y aura une partie d'annotation de type pour nous aider ailleurs dans notre app.
+
+<FileName filename="contexts/ThemeContext.tsx" blogGithub />
+
+```tsx
+import React, { createContext, useState, ReactNode, useEffect } from "react";
+
+// On défini ici le type ce qui sera stocké dans notre contexte.
+type ContextType = {
+  // Une fonction pour switch entre light et dark
+  toggleDark: () => void;
+  // La valeur effective du thème
+  isDark: boolean;
+};
+
+// Cette variable contient le contexte par défaut qui sera (sauf en cas de bug) toujours écrasé.
+const defaultContext: ContextType = {
+  toggleDark: () => {
+    console.warn("Should have been overriden");
+  },
+  isDark: true,
+};
+
+// On crée le contexte à partir du contexte par défaut.
+const ThemeContext = createContext(defaultContext);
+
+// On défini et exporte un component pour wrap le provider de React afi de définir un contexte basé sur un useState
+export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
+  // Le thème est sombre par défaut.
+  const [isDark, setIsDark] = useState(true);
+
+  // On défini un "meilleur" contexte que le defaultContext.
+  const context: ContextType = {
+    toggleDark: () => {
+      setIsDark(!isDark);
+    },
+    isDark,
+  };
+
+  // On génère un provider avec notre contexte
+  return (
+    <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>
+  );
+};
+
+// Par défaut le context est exportéé et pas le provider.
+export default ThemeContext;
+```
+
+On l'utilise de la manière suivante:
+
+Tout dabord on va wrap notre app entière dans notre provider
+
+```tsx
+function MyApp(appProps: AppProps) {
+  return (
+    <>
+      […]
+      <ThemeContextProvider>
+        […]
+        <WrappedApp {...appProps} />
+      </ThemeContextProvider>
+    </>
+  );
+}
+```
 
 ### Mega class
 

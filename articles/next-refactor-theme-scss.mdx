@@ -1,32 +1,32 @@
 ---
-title: "Theme clair et sombre en SCSS et React"
+title: "Thème clair et sombre en SCSS et React"
 date: 2020-11-15T04:33:13+09:00
 categories:
   - front
   - code
-description: "Comment facilement gérer son theme clair/sombre en SCSS + React"
+description: "Comment facilement gérer son thème clair/sombre en SCSS + React"
 ---
 
 ## Contexte
 
-Un des trends actuel veut que l'on propose une version claire et une version sombre de nos sites à contenu textuel.
+Un des trends actuel veut que l'on propose une version claire et une version sombre de nos sites avec du contenu textuel.
 En effet, certains utilisateurs préfèrent l'un où l'autre pour des questions de lisibilité.
-On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS mais une partie de l'article, nottament le bout sur le scss s'appliquerait en dehors de ce contexte.
+On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS. Cependant, le bout sur le scss s'appliquerait en dehors de ce contexte.
 
 ## Thème SCSS the right way
 
-On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes:
+On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes :
 
 - Avoir un fichier scss différent par thème. C'est globalement bien si votre css fait moins de 100 lignes. Plus que ça et c'est le suicide assuré au moindre changement.
-- Importer et set des variables CSS différentes en fonction du thème. Vous trouverez un excelent example [ici](https://www.freecodecamp.org/news/how-to-easily-create-themes-with-css-variables-2d0f4cfa5b9a/). C'est franchement une solution tout à fait valide. L'interprétation du CSS sera plus longue car l'utilisation des variables se fera coté client. Les variable CSS ne sont pas vraiment agréable à écrire non plus.
-- Avoir une fonction utilitaire permettant de généreren double tous les bouts qui sont dépendants du thème. C'est la méthode que je vais expliciter dans cet article.
+- Importer et set des variables CSS différentes en fonction du thème. Vous trouverez un excellent exemple [ici](https://www.freecodecamp.org/news/how-to-easily-create-themes-with-css-variables-2d0f4cfa5b9a/). C'est franchement une solution tout à fait valide. L'interprétation du CSS sera plus longue car l'utilisation des variables se fera coté client. Les variables CSS ne sont pas vraiment agréables à écrire non plus.
+- Avoir une fonction utilitaire permettant de générer en double tous les bouts qui sont dépendants du thème. C'est la méthode que je vais expliciter dans cet article.
 
 ### Version haut niveau de ce qu'on veut
 
-On veut appliquer une classe à un élément assez haut de notre arborescence de DOM (si possible `<body>`) pour indiquer quel theme est actuellement utilisée.
-Ici j'ai choisi d'appeller ces classes `theme--nomDuTheme`.
+On veut appliquer une classe à un élément assez haut de notre arborescence de DOM (si possible `<body>`) pour indiquer quel thème est actuellement utilisée.
+Ici j'ai choisi d'appeler ces classes `theme--nomDuTheme`.
 
-On veut que notre scss final ressemble autant que possible à:
+On veut que notre scss final ressemble autant que possible à :
 
 ```scss
 div {
@@ -34,7 +34,7 @@ div {
 }
 ```
 
-Ce qui va générer:
+Ce qui va générer :
 
 ```css
 .theme--light div {
@@ -50,7 +50,7 @@ Ce qui va générer:
 
 Notre solution sera basée sur cet [article](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995) adapté à React, aux modules CSS et à leur implémentation dans NextJS.
 
-### Theme scss
+### Thème scss
 
 Commençons par définir un jeu de couleurs dans un partial SCSS :
 
@@ -92,7 +92,7 @@ $cyan: #2aa198;
 $green: #859900;
 ```
 
-Et pour utiliser ce fichier:
+Pour utiliser ce fichier :
 
 ```scss
 @import "path/to/theme";
@@ -114,7 +114,7 @@ div {
 }
 ```
 
-Bon… Conceptuellement c'est très beau mais c'est pas vraiment pratique.
+Bon… C’est très beau, mais c'est pas vraiment pratique.
 
 ## Refactor avec des fonctions SCSS
 
@@ -154,7 +154,7 @@ On va donc se créer des petits utilitaires scss pour simplifier et automatiser 
 }
 ```
 
-Si on refactor notre scss précédent:
+Si on refactor notre scss précédent :
 
 ```scss
 @import "path/to/theme";
@@ -167,9 +167,7 @@ div {
 }
 ```
 
-Et un exemple dans ce blog:
-
-<FileName filename="styles/Code.scss" line="5-7" blogGithub />
+Un exemple dans ce blog : [Code.scss](https://github.com/zaratan/zarablog-next/blob/main/styles/Code.scss#L5-L7)
 
 On a donc maintenant une version facile à utiliser.
 
@@ -178,11 +176,11 @@ On a donc maintenant une version facile à utiliser.
 Bon c'est bien cool, on a un CSS qui est généré avec une version par thème.
 On va maintenant orchestrer le switch en React/NextJS.
 
-### React: Context
+### React : Context
 
 Tout d'abord on va rendre le choix du style accessible de façon globale avec un contexte.
 
-Nottez que ceci est du typescript et qu'il y aura une partie d'annotation de type pour nous aider ailleurs dans notre app.
+Notez que ceci est du typescript et qu'il y aura une partie d'annotation de type pour nous aider ailleurs dans notre app.
 
 <FileName filename="contexts/ThemeContext.tsx" blogGithub />
 
@@ -233,7 +231,7 @@ export default ThemeContext;
 
 On l'utilise de la manière suivante :
 
-###### On va wrap notre app entière dans notre provider
+##### On va wrap notre app entière dans notre provider
 
 <FileName filename="pages/_app.tsx" blogGithub line="22-39" />
 
@@ -253,7 +251,7 @@ function MyApp(appProps: AppProps) {
 
 ##### On lit notre context dans les différentes parties de l'app
 
-On applique notre classe de thème à un element haut dans la hiérarchie du DOM.
+On applique notre classe de thème à un élément haut dans la hiérarchie du DOM.
 
 <FileName filename="pages/_app.tsx" blogGithub line="13-20" />
 
@@ -266,7 +264,7 @@ const WrappedApp = ({ Component, pageProps }: AppProps) => {
 };
 ```
 
-On défini un bouton pour switch entre les différents thèmes
+On définit un bouton pour switch entre les différents thèmes
 
 <FileName filename="components/Header.tsx" blogGithub line="18-97" />
 
@@ -303,12 +301,12 @@ const Header = () => {
 ```
 
 Un lecteur attentif aura remarqué que les components `MyApp` et `WrappedApp` se trouvent dans le même fichier.
-La raison derière ce choix est pour être capable d'acceder au contexte au plus haut possible dans la hiérarchie.
+La raison derrière ce choix est pour être capable d'accéder au contexte au plus haut possible dans la hiérarchie.
 
-### React: Local Storage
+### React : Local Storage
 
 Un utilisateur accédant à notre site pour la première fois, se voit assigner le thème sombre.
-Si jamais il choisi de passer au thème clair puis recharge la page on lui sert à nouveau le thème sombre.
+Si jamais il choisit de passer au thème clair puis recharge la page on lui sert à nouveau le thème sombre.
 
 On va maintenant stocker ce choix de thème dans le local storage du navigateur.
 Comme la gestion de l'état du thème est centralisée dans un context on va juste avoir besoin de modifier ce dernier.
@@ -343,12 +341,14 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
 };
 ```
 
-### React: Detecter le thème préféré de l'utilisateur
+### React : Détecter le thème préféré de l'utilisateur
 
-Si l'utilisateur est sur un OS qui supporte les thèmes sombres et clair et que son [navigateur supporte sa detection](https://caniuse.com/prefers-color-scheme), on peut :
-Si et seulement si il n'a jamais choisi de thème manuellement, respecter cette préférence.
+Si l'utilisateur est sur un OS qui supporte les thèmes sombres et clair et que son [navigateur supporte sa détection](https://caniuse.com/prefers-color-scheme), on peut :
+Si et seulement s’il n'a jamais choisi de thème manuellement, respecter cette préférence.
 
-Encore une fois, juste besoin de changer legerement le context:
+Encore une fois, juste besoin de changer légèrement le context :
+
+<FileName filename="contexts/ThemeContext.tsx" blogGithub />
 
 ```tsx
 export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
@@ -373,12 +373,12 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
 ## NextJS quirks
 
 NextJS à 1 particularité par rapport à tout ça :
-Il permet de faire des [modules [s]css](https://nextjs.org/docs/basic-features/built-in-css-support#adding-component-level-css) où chaque classe CSS sera pré et post fixée par une string unique;
+Il permet de faire des [modules [s]css](https://nextjs.org/docs/basic-features/built-in-css-support#adding-component-level-css) où chaque classe CSS sera pré et post fixée par une string unique.
 
-C'est très pratique car ça permet d'assurer que un module CSS ne s'appliquera qu'au component dans lequel il est utilisé et n'aura donc pas d'effets de bord sur le reste de vos pages.
+C'est très pratique car ça permet d'assurer qu’un module CSS ne s'appliquera qu'au component dans lequel il est utilisé et n'aura donc pas d'effets de bord sur le reste de vos pages.
 
 Cependant, certaines fois on ne veut pas que certaines classes soient préfixées dans notre scss (`.theme--light` par exemple).
-On doit donc notter ces classes de la manière suivante dans nos fichiers `xxx.module.scss`:
+On doit donc noter ces classes de la manière suivante dans nos fichiers `xxx.module.scss`:
 
 ```scss
 :global(.theme--light) {
@@ -386,7 +386,7 @@ On doit donc notter ces classes de la manière suivante dans nos fichiers `xxx.m
 }
 ```
 
-Cette particularité va amener quelques ajustements:
+Cette particularité va amener quelques ajustements :
 
 ```scss
 @mixin themed() {
@@ -429,6 +429,6 @@ Pour ajouter du thème à l'élément body ou à la div englobante sus-citée, o
 On a vu comment appliquer un thème scss facilement et on en a profité pour faire un détour par React Context.
 Vu la difficulté assez faible et le gain en accessibilité d'ajouter un thème sombre, ça serait dommage de s'en priver.
 
-Pour aller plus loin:
+Pour aller plus loin :
 
 - [https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995)

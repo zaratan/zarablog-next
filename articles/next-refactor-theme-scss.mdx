@@ -1,6 +1,6 @@
 ---
 title: "Thème clair et sombre en SCSS et React"
-date: 2020-11-15T04:33:13+09:00
+date: 2020-11-22T06:00:13+09:00
 categories:
   - front
   - code
@@ -9,9 +9,10 @@ description: "Comment facilement gérer son thème clair/sombre en SCSS + React"
 
 ## Contexte
 
-Un des trends actuel veut que l'on propose une version claire et une version sombre de nos sites avec du contenu textuel.
+Une des tendances actuelles veut que l'on propose une version claire et une version sombre de nos sites avec du contenu textuel.
 En effet, certains utilisateurs préfèrent l'un où l'autre pour des questions de lisibilité.
-On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS. Cependant, le bout sur le scss s'appliquerait en dehors de ce contexte.
+On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS.
+Cependant, le bout sur le scss pourrait s'appliquer en dehors de ce contexte.
 
 ## Thème SCSS the right way
 
@@ -123,13 +124,16 @@ On va donc se créer des petits utilitaires scss pour simplifier et automatiser 
 <FileName filename="styles/_theme.scss" line="52-73" blogGithub />
 
 ```scss
-// génère un nouveau mixin nommé themed. L'idée est que toutes les règles css définie à l'interieur seront dupliquée en dark et light.
+// génère un nouveau mixin nommé themed.
+// L'idée est que toutes les règles css définie à l'interieur
+// seront dupliquée en dark et light.
 @mixin themed() {
   // pour chaque thème défini dans la variable $themes
   @each $theme, $map in $themes {
-    // défini une nouveau matcher .theme--nomdutheme le-matcheur-courant
+    // défini un nouveau matcher .theme--nomdutheme le-matcheur-courant
     .theme--#{$theme} & {
-      // defini une variable globale contenant un hash de toutes les valeurs courantes du theme
+      // defini une variable globale contenant un hash
+      // de toutes les valeurs courantes du theme
       $theme-map: () !global;
       @each $key, $submap in $map {
         $value: map-get(map-get($themes, $theme), "#{$key}");
@@ -148,7 +152,8 @@ On va donc se créer des petits utilitaires scss pour simplifier et automatiser 
   }
 }
 
-// Nouvelle fonction t qui va aller lire la valeur de la clé dans le hash temporaire défini par le mixin
+// Nouvelle fonction t qui va aller lire la valeur
+// de la clé dans le hash temporaire défini par le mixin
 @function t($key: "base0") {
   @return map-get($theme-map, $key);
 }
@@ -195,7 +200,8 @@ type ContextType = {
   isDark: boolean;
 };
 
-// Cette variable contient le contexte par défaut qui sera (sauf en cas de bug) toujours écrasé.
+// Cette variable contient le contexte par défaut qui sera
+// (sauf en cas de bug) toujours écrasé.
 const defaultContext: ContextType = {
   toggleDark: () => {
     console.warn("Should have been overriden");
@@ -206,7 +212,9 @@ const defaultContext: ContextType = {
 // On crée le contexte à partir du contexte par défaut.
 const ThemeContext = createContext(defaultContext);
 
-// On défini et exporte un component pour wrap le provider de React afi de définir un contexte basé sur un useState
+// On défini et exporte un component pour
+// wrap le provider de React afin de définir
+// un contexte basé sur un useState
 export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
   // Le thème est sombre par défaut.
   const [isDark, setIsDark] = useState(true);
@@ -356,14 +364,14 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const lsDark = JSON.parse(localStorage.getItem('ThemeContext:isDark'));
-    console.log({ lsDark });
     if (lsDark !== undefined && lsDark !== null) {
       setIsDark(lsDark);
-    } else {
-      // detecte si l'utilisateur demande explicitement un thème clair.
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-        setIsDark(false)
-      }
+    // detecte si l'utilisateur demande explicitement un thème clair.
+    } else if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: light)').matches
+    ) {
+      setIsDark(false);
     }
   }, []);
   […]
@@ -372,7 +380,7 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
 
 ## NextJS quirks
 
-NextJS à 1 particularité par rapport à tout ça :
+NextJS a 1 particularité par rapport à tout ça :
 Il permet de faire des [modules [s]css](https://nextjs.org/docs/basic-features/built-in-css-support#adding-component-level-css) où chaque classe CSS sera pré et post fixée par une string unique.
 
 C'est très pratique car ça permet d'assurer qu’un module CSS ne s'appliquera qu'au component dans lequel il est utilisé et n'aura donc pas d'effets de bord sur le reste de vos pages.

@@ -1,0 +1,442 @@
+---
+title: "Thème clair et sombre en SCSS et React"
+date: 2020-11-22T06:00:13+09:00
+categories:
+  - front
+  - code
+description: "Comment facilement gérer son thème clair/sombre en SCSS + React"
+---
+
+## Contexte
+
+Une des tendances actuelles veut que l'on propose une version claire et une version sombre de nos sites avec du contenu textuel.
+En effet, certains utilisateurs préfèrent l'un où l'autre pour des questions de lisibilité.
+On va voir dans cet article une façon de gérer ça dans un contexte React et NextJS.
+Cependant, le bout sur le scss pourrait s'appliquer en dehors de ce contexte.
+
+## Thème SCSS the right way
+
+On a globalement 3 façons (dans ce que j'ai pu lire) de gérer des thèmes :
+
+- Avoir un fichier scss différent par thème. C'est globalement bien si votre css fait moins de 100 lignes. Plus que ça et c'est le suicide assuré au moindre changement.
+- Importer et set des variables CSS différentes en fonction du thème. Vous trouverez un excellent exemple [ici](https://www.freecodecamp.org/news/how-to-easily-create-themes-with-css-variables-2d0f4cfa5b9a/). C'est franchement une solution tout à fait valide. L'interprétation du CSS sera plus longue car l'utilisation des variables se fera coté client. Les variables CSS ne sont pas vraiment agréables à écrire non plus.
+- Avoir une fonction utilitaire permettant de générer en double tous les bouts qui sont dépendants du thème. C'est la méthode que je vais expliciter dans cet article.
+
+### Version haut niveau de ce qu'on veut
+
+On veut appliquer une classe à un élément assez haut de notre arborescence de DOM (si possible `<body>`) pour indiquer quel thème est actuellement utilisée.
+Ici j'ai choisi d'appeler ces classes `theme--nomDuTheme`.
+
+On veut que notre scss final ressemble autant que possible à :
+
+```scss
+div {
+  color: $grey;
+}
+```
+
+Ce qui va générer :
+
+```css
+.theme--light div {
+  color: #123456;
+}
+
+.theme--dark div {
+  color: #fedcba;
+}
+```
+
+Ça va permettre de générer un CSS final au moment du build, le minifier et le passer à l'utilisateur.
+
+Notre solution sera basée sur cet [article](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995) adapté à React, aux modules CSS et à leur implémentation dans NextJS.
+
+### Thème scss
+
+Commençons par définir un jeu de couleurs dans un partial SCSS :
+
+<FileName filename="styles/_theme.scss" line="1-31" blogGithub />
+
+```scss
+// Variables dépendants du thème
+$themes: (
+  "dark": (
+    base0: #839496,
+    base1: #93a1a1,
+    base2: #073642,
+    base3: #002b36,
+    base00: #657b83,
+    base01: #586e75,
+    base02: #eee8d5,
+    base03: #fdf6e3,
+  ),
+  "light": (
+    base0: #657b83,
+    base1: #586e75,
+    base2: #eee8d5,
+    base3: #fdf6e3,
+    base00: #839496,
+    base01: #93a1a1,
+    base02: #073642,
+    base03: #002b36,
+  ),
+);
+
+// Couleurs et autres variables communes
+$yellow: #b58900;
+$orange: #cb4b16;
+$red: #dc322f;
+$magenta: #d33682;
+$violet: #6c71c4;
+$blue: #268bd2;
+$cyan: #2aa198;
+$green: #859900;
+```
+
+Pour utiliser ce fichier :
+
+```scss
+@import "path/to/theme";
+
+div {
+  color: $orange;
+}
+
+.theme--light {
+  div {
+    background-color: map-get(map-get($themes, "light"), "base1");
+  }
+}
+
+.theme--dark {
+  div {
+    background-color: map-get(map-get($themes, "dark"), "base1");
+  }
+}
+```
+
+Bon… C’est très beau, mais c'est pas vraiment pratique.
+
+## Refactor avec des fonctions SCSS
+
+On va donc se créer des petits utilitaires scss pour simplifier et automatiser tout ça.
+
+<FileName filename="styles/_theme.scss" line="52-73" blogGithub />
+
+```scss
+// génère un nouveau mixin nommé themed.
+// L'idée est que toutes les règles css définie à l'interieur
+// seront dupliquée en dark et light.
+@mixin themed() {
+  // pour chaque thème défini dans la variable $themes
+  @each $theme, $map in $themes {
+    // défini un nouveau matcher .theme--nomdutheme le-matcheur-courant
+    .theme--#{$theme} & {
+      // defini une variable globale contenant un hash
+      // de toutes les valeurs courantes du theme
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
+      }
+      // execute le contenu original du mixin
+      @content;
+      // supprime la variable globale
+      $theme-map: null !global;
+    }
+  }
+}
+
+// Nouvelle fonction t qui va aller lire la valeur
+// de la clé dans le hash temporaire défini par le mixin
+@function t($key: "base0") {
+  @return map-get($theme-map, $key);
+}
+```
+
+Si on refactor notre scss précédent :
+
+```scss
+@import "path/to/theme";
+
+div {
+  color: $orange;
+  @include themed {
+    background-color: t("base1");
+  }
+}
+```
+
+Un exemple dans ce blog : [Code.scss](https://github.com/zaratan/zarablog-next/blob/main/styles/Code.scss#L5-L7)
+
+On a donc maintenant une version facile à utiliser.
+
+## React + NextJS tooling
+
+Bon c'est bien cool, on a un CSS qui est généré avec une version par thème.
+On va maintenant orchestrer le switch en React/NextJS.
+
+### React : Context
+
+Tout d'abord on va rendre le choix du style accessible de façon globale avec un contexte.
+
+Notez que ceci est du typescript et qu'il y aura une partie d'annotation de type pour nous aider ailleurs dans notre app.
+
+<FileName filename="contexts/ThemeContext.tsx" blogGithub />
+
+```tsx
+import React, { createContext, useState, ReactNode, useEffect } from "react";
+
+// On défini ici le type ce qui sera stocké dans notre contexte.
+type ContextType = {
+  // Une fonction pour switch entre light et dark
+  toggleDark: () => void;
+  // La valeur effective du thème
+  isDark: boolean;
+};
+
+// Cette variable contient le contexte par défaut qui sera
+// (sauf en cas de bug) toujours écrasé.
+const defaultContext: ContextType = {
+  toggleDark: () => {
+    console.warn("Should have been overriden");
+  },
+  isDark: true,
+};
+
+// On crée le contexte à partir du contexte par défaut.
+const ThemeContext = createContext(defaultContext);
+
+// On défini et exporte un component pour
+// wrap le provider de React afin de définir
+// un contexte basé sur un useState
+export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
+  // Le thème est sombre par défaut.
+  const [isDark, setIsDark] = useState(true);
+
+  // On défini un "meilleur" contexte que le defaultContext.
+  const context: ContextType = {
+    toggleDark: () => {
+      setIsDark(!isDark);
+    },
+    isDark,
+  };
+
+  // On génère un provider avec notre contexte
+  return (
+    <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>
+  );
+};
+
+// Par défaut le context est exporté et pas le provider.
+export default ThemeContext;
+```
+
+On l'utilise de la manière suivante :
+
+##### On va wrap notre app entière dans notre provider
+
+<FileName filename="pages/_app.tsx" blogGithub line="22-39" />
+
+```tsx
+function MyApp(appProps: AppProps) {
+  return (
+    <>
+      […]
+      <ThemeContextProvider>
+        […]
+        <WrappedApp {...appProps} />
+      </ThemeContextProvider>
+    </>
+  );
+}
+```
+
+##### On lit notre context dans les différentes parties de l'app
+
+On applique notre classe de thème à un élément haut dans la hiérarchie du DOM.
+
+<FileName filename="pages/_app.tsx" blogGithub line="13-20" />
+
+```tsx
+const WrappedApp = ({ Component, pageProps }: AppProps) => {
+  const { isDark } = useContext(ThemeContext);
+  return (
+    <div className={`${isDark ? "theme--dark" : "theme--light"}`}>[…]</div>
+  );
+};
+```
+
+On définit un bouton pour switch entre les différents thèmes
+
+<FileName filename="components/Header.tsx" blogGithub line="18-97" />
+
+```tsx
+const Header = () => {
+  const { isDark, toggleDark } = useContext(ThemeContext);
+  […]
+
+  return (
+    <header>
+      <nav>
+        […]
+        <span
+          tabIndex={0}
+          role="button"
+          aria-label="light"
+          onClick={toggleDark}
+          onKeyDown={toggleDark}
+        >
+          <span>
+            {isDark ? (
+              <FaSun />
+            ) : (
+              <FaMoon />
+            )}
+          </span>
+        </span>
+        […]
+      </nav>
+      […]
+    </header>
+  );
+};
+```
+
+Un lecteur attentif aura remarqué que les components `MyApp` et `WrappedApp` se trouvent dans le même fichier.
+La raison derrière ce choix est pour être capable d'accéder au contexte au plus haut possible dans la hiérarchie.
+
+### React : Local Storage
+
+Un utilisateur accédant à notre site pour la première fois, se voit assigner le thème sombre.
+Si jamais il choisit de passer au thème clair puis recharge la page on lui sert à nouveau le thème sombre.
+
+On va maintenant stocker ce choix de thème dans le local storage du navigateur.
+Comme la gestion de l'état du thème est centralisée dans un context on va juste avoir besoin de modifier ce dernier.
+
+<FileName filename="contexts/ThemeContext.tsx" blogGithub />
+
+```tsx
+export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
+  const [isDark, setIsDark] = useState(true);
+
+  // Après que ce component ait chargé on va lire le local storage.
+  useEffect(() => {
+    // Lire la valeur dans le local storage
+    const lsDark = JSON.parse(localStorage.getItem('ThemeContext:isDark'));
+    // Si la valeur a été définie (true/false)
+    if (lsDark !== undefined && lsDark !== null) {
+      // La set
+      setIsDark(lsDark);
+    }
+  // Faire ça une et unique fois au démarage de l'app
+  }, []);
+
+  const context: ContextType = {
+    toggleDark: () => {
+      // A chaque fois qu'on toggle le thème on écrit dans le local storage
+      localStorage.setItem('ThemeContext:isDark', String(!isDark));
+      setIsDark(!isDark);
+    },
+    isDark,
+  };
+  […]
+};
+```
+
+### React : Détecter le thème préféré de l'utilisateur
+
+Si l'utilisateur est sur un OS qui supporte les thèmes sombres et clair et que son [navigateur supporte sa détection](https://caniuse.com/prefers-color-scheme), on peut :
+Si et seulement s’il n'a jamais choisi de thème manuellement, respecter cette préférence.
+
+Encore une fois, juste besoin de changer légèrement le context :
+
+<FileName filename="contexts/ThemeContext.tsx" blogGithub />
+
+```tsx
+export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const lsDark = JSON.parse(localStorage.getItem('ThemeContext:isDark'));
+    if (lsDark !== undefined && lsDark !== null) {
+      setIsDark(lsDark);
+    // detecte si l'utilisateur demande explicitement un thème clair.
+    } else if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: light)').matches
+    ) {
+      setIsDark(false);
+    }
+  }, []);
+  […]
+};
+```
+
+## NextJS quirks
+
+NextJS a 1 particularité par rapport à tout ça :
+Il permet de faire des [modules [s]css](https://nextjs.org/docs/basic-features/built-in-css-support#adding-component-level-css) où chaque classe CSS sera pré et post fixée par une string unique.
+
+C'est très pratique car ça permet d'assurer qu’un module CSS ne s'appliquera qu'au component dans lequel il est utilisé et n'aura donc pas d'effets de bord sur le reste de vos pages.
+
+Cependant, certaines fois on ne veut pas que certaines classes soient préfixées dans notre scss (`.theme--light` par exemple).
+On doit donc noter ces classes de la manière suivante dans nos fichiers `xxx.module.scss`:
+
+```scss
+:global(.theme--light) {
+  color: blue;
+}
+```
+
+Cette particularité va amener quelques ajustements :
+
+```scss
+@mixin themed() {
+  @each $theme, $map in $themes {
+    :global(.theme--#{$theme}) & {
+      […]
+    }
+  }
+}
+
+@mixin gthemed() {
+  @each $theme, $map in $themes {
+    .theme--#{$theme} & {
+      […]
+    }
+  }
+}
+```
+
+On a donc deux mixin quasiment identiques à la différence que `themed` ajoute un `:global()` autour du thème.
+On utilise le `gthemed` dans les fichiers globaux ([Code.scss](https://github.com/zaratan/zarablog-next/blob/main/styles/Code.scss#L5-L7)) et le `themed` dans les modules ([Header.module.scss](https://github.com/zaratan/zarablog-next/blob/main/components/Header.module.scss#L20-L22)).
+
+De plus il est difficile d'appliquer une classe `.theme--dark` basée sur la valeur d'un Context à un élément plus haut qu'une div englobante.
+Pour ajouter du thème à l'élément body ou à la div englobante sus-citée, on sera "obligé" d'écrire les deux `.theme--light` et `.theme--dark` à la main.
+
+<FileName filename="styles/GlobalStyle.scss" blogGithub line="42-48" />
+
+```scss
+.theme--dark {
+  color: map-get(map-get($themes, "dark"), "base1");
+}
+
+.theme--light {
+  color: map-get(map-get($themes, "light"), "base1");
+}
+```
+
+## Conclusion
+
+On a vu comment appliquer un thème scss facilement et on en a profité pour faire un détour par React Context.
+Vu la difficulté assez faible et le gain en accessibilité d'ajouter un thème sombre, ça serait dommage de s'en priver.
+
+Pour aller plus loin :
+
+- [https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995](https://medium.com/@katiemctigue/how-to-create-a-dark-mode-in-sass-609f131a3995)

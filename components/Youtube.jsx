@@ -1,20 +1,19 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
 import YoutubeErrorCatcher from './YoutubeErrorCatcher';
 
-// eslint-disable-next-line react/prop-types
-const YoutubeWrap = ({ videoId }) => {
+const Youtube = ({ videoId }) => {
   useEffect(() => {
     import('lite-youtube-embed/src/lite-yt-embed');
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return (
-    <YoutubeErrorCatcher videoId={videoId}>
-      <lite-youtube videoId={videoId} />
-    </YoutubeErrorCatcher>
-  );
+  return <lite-youtube videoId={videoId} />;
 };
 
+const YoutubeWrap = ({ videoId }) => (
+  <YoutubeErrorCatcher videoId={videoId}>
+    <Youtube videoId={videoId} />
+  </YoutubeErrorCatcher>
+);
 export default YoutubeWrap;

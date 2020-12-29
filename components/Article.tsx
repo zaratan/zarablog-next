@@ -35,7 +35,11 @@ const Article = ({
         </section>
       </header>
       <article
-        className={[styles.articleContainer, profileOpenClass].join(' ')}
+        className={[
+          styles.articleContainer,
+          profileOpenClass,
+          'line-numbers',
+        ].join(' ')}
       >
         {children}
       </article>

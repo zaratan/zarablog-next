@@ -1,0 +1,548 @@
+---
+title: "MDX et coloration syntaxique"
+date: 2020-12-28T04:33:13+09:00
+categories:
+  - front
+  - code
+description: "Un article assez simple sur la configuration que j’utilise pour traiter du MDX dans une app Next/React (avec en bonus la coloration syntaxique)"
+---
+
+Un article assez simple sur la configuration que j’utilise pour traiter du MDX dans une app NextJS.
+
+## Le MDX quésaco
+
+Normalement vous savez déjà ce que sont les `.md` ([fichiers markdown](https://fr.wikipedia.org/wiki/Markdown "Markdown")).
+Les `.mdx` sont une version étendue (**X**tended) de ce dernier.
+Ils étendent le markdown en lui ajoutant la possibilité d’avoir des composants React à l’intérieur.
+
+Ce à quoi cela va servir, c'est à ajouter des nouveaux "tags" à notre markdown de manière à avoir de nouveaux comportements.
+
+Par exemple, si on veut afficher des iframes Youtube embeded comme dans [cet article](./react-basics), on peut ajouter un nouveau tag `<Youtube />`:
+
+<FileName filename="articles/sql.mdx" line="15" blogGithub />
+
+```md
+## Subtitle
+
+Ceci est un composant React :
+<Youtube videoId="LOHx1Q4vv5Q" />
+
+**Very important text**
+```
+
+Le tag `<Youtube />` étant un composant React tout ce qu’il y a de plus “classique” :
+
+<FileName filename="components/Youtube.jsx" blogGithub />
+
+```tsx
+import React from "react";
+
+// […]
+
+const Youtube = ({ videoId }) => {
+  useEffect(() => {
+    import("lite-youtube-embed/src/lite-yt-embed");
+  }, []);
+
+  return <lite-youtube videoId={videoId} />;
+};
+
+// […]
+```
+
+### Mon utilisation du MDX
+
+J’utilise le mdx dès que j’ai besoin de rédiger des articles (ou fournir une interface de rédaction pratique pour des articles).
+Que ce soit ce blog (dans ce cas c’est moi qui écris les articles) ou un site qui contiendra de la documentation (dans ce cas les articles peuvent être écrits par des tiers).
+
+En effet markdown étant très accessible il est possible pour des non-tech d’en rédiger (sachant qu’il existe de nombreux éditeurs qui en simplifient encore plus l’usage).
+
+## Intégration dans du NextJS
+
+Bon, maintenant voyons comment intégrer des fichiers mdx et un site en NextJS (et dans une certaine mesure n’importe quel site React même s’il faudra adapter certaines parties (cet exercice sera laissé au lecteur)).
+
+Mettons qu’on a un site NextJS vide et une liste d’articles (rédigés au format `.mdx`) rangés dans un dossier `/articles`. On a une page `/pages/index.tsx` qui devra lister tous les articles et on va vouloir une page par article.
+
+### Petit aparté sur le vocabulaire et l'utilisation de NextJS
+
+NextJS gère le routing interne avec des composants "spéciaux" appelés "[pages](https://nextjs.org/docs/basic-features/pages)".
+Chaque fichier (`.js`/`.jsx`/`.ts`/`.tsx`) se trouvant dans le dossier `/pages` devra définir un composant par défaut et c'est ce qui sera render quand vous vous rendrez sur la route du même nom.
+Par exemple avec un dossier `/pages` ressemblant à: `/pages/index.tsx`, `/pages/about.tsx` et `/pages/products/tea.tsx` on va avoir 3 routes disponibles.
+Respectivement: `/`, `/about` et `/products/tea`.
+
+Par défaut ces composants de "page" sont render sans aucune props (paramètre).
+
+Quand on déploie NextJS sur un hébergeur compatible ou dans un container, on va avoir deux phases:
+
+- Une phase de `build`, qui va générer tout ce dont a besoin le serveur (notamment le JS/CSS minifié). (`next build`)
+- Une phase de `run` qui va écouter sur un port donné et servir les requêtes HTTP. (`next start`)
+
+Chaque page peut être de 3 (~4) types:
+
+##### Soit purement statique ○
+
+C'est le mode par "défaut" de chaque page.
+Dans ce cas là, au moment de la phase de `build`, NextJS va générer une version purement HTML/CSS de notre page qui sera donnée au client quand il visitera la route correspondante.
+Avec ça sera envoyé le JavaScript minimal (grâce à du [Tree Shaking](https://webpack.js.org/guides/tree-shaking/)) qui va démarrer l'app React alors que le client pourra déjà voir une première version de sa page.
+
+##### Soit purement générée coté serveur λ
+
+Dans ce cas là a chaque fois qu'un utilisateur visitera la route de cette page, le serveur NextJS va render la page et la servir au client.
+Comme pour les pages statiques un JS minimal démarrant l'app React sera envoyé en même temps.
+Ce mode est évidemment plus lent car il demande de render la page avant d'envoyer quoi que ce soit au client.
+De plus, il est impossible de cacher le HTML/CSS dans un CDN pour améliorer sa rapidité.
+
+Ce mode de page est utilisé quand une page a **absoluement** besoin d'une props pour s'afficher.
+La valeur de cette props doit changer avec le temps et doit être disponible avant que l'utilisateur ne voit le moindre bout de la page.
+Le cas d'usage est que la valeur de cette props ne peut pas être chargée/calculée coté client.
+La page doit utiliser une fonction [getServerSideProps](https://nextjs.org/docs/basic-features/data-fetching#getserversideprops-server-side-rendering) pour entrer dans ce mode.
+
+Ce mode devrait être éviter autant que possible.
+
+##### Soit un mode hybride (Server Side Generation) ●
+
+Dans ce cas là, on veut des pages qui ont besoin d'une props comme dans le mode serveur mais, la valeur de cette props ne changera jamais au cours du temps.
+On rajoute donc une étape dans la génération statique en HTML/CSS de la page qui consistera à pré-calculer au format JSON cette fameuse props.
+Quand un utilisateur visitera la route correspondant à la page, NextJS lui servira le HTML/CSS prérender, le JS minimal ET le fichier JSON contenant la valeur de la props.
+Le JS et le JSON serviront à démarrer l'app React.
+
+Pour rentrer dans ce mode, on doit définir une fonction [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation).
+
+Bonus qui sera couvert dans un futur article: Les SSG incrémentales.
+
+### Lister tous les fichiers et en faire des routes
+
+On va commencer par lister et traiter tous nos fichiers. Pour l’instant on ne va pas s’occuper de lire leur contenu (ou très peu).
+
+##### Index
+
+Pour avoir accès à ces fichiers en NextJS, sachant que la liste des articles est fixe pour un commit donné, on va compiler la liste des articles au moment du build de notre site.
+
+On va utiliser la fonction [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) de NextJS.
+Comme indiqué précédemment, cette fonction sera appelée coté server à la compilation et son retour sera fourni sous forme de `props` à notre page.
+
+Par exemple, prenons une page où la génération de la props est lent (ici simulé par un `sleep` long) :
+
+```tsx
+export const getStaticProps: GetStaticProps = async () => {
+  // Simulons un appel de fonction long
+  await sleep(1000000);
+
+  return {
+    props: { name: "Zaratan" },
+  };
+};
+
+const Hello = ({ name }) => <main>Hello {name}!</main>;
+
+export default Hello;
+```
+
+Accéder à la page sera instantané, car le `sleep` ne sera exécuté qu’au cours du `build`. Celle-ci affichera “Hello Zaratan!”
+
+On va donc écrire un `getStaticProps` qui va lister les fichiers `.mdx`:
+
+<FileName filename="pages/index.tsx" blogGithub />
+
+```tsx
+import fs from "fs";
+import path from "path";
+import { GetStaticProps } from "next";
+import matter from "gray-matter";
+import { sortBy } from "lodash";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import Layout from "../components/Layout";
+import ArticleList from "../components/ArticleList";
+
+export const getStaticProps: GetStaticProps = async () => {
+  // Défini le dossier ou sont les articles
+  const postsDirectory = path.join(process.cwd(), "articles");
+  // Trouve tous les fichiers dans ce dossier
+  const filenames = fs.readdirSync(postsDirectory);
+
+  // Ici on pourrait supprimer tout ce qui n'est pas un .mdx
+
+  // A partir des path vers les fichiers
+  // On va en lire partiellement le contenu pour
+  // en extraire des métadonnées.
+  // Ici:
+  // - la date d'écriture
+  // - le titre
+  // - le slug (la future route vers l'article)
+  const unsortedArticles: Array<{
+    date: Date;
+    title: string;
+    slug: string;
+  }> = filenames.map((filename) => {
+    // génère le path entier
+    const filePath = path.join(postsDirectory, filename);
+    // lit le contenu du fichier
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    // lit les métadonnées du mdx
+    // (Plus d'informations plus bas dans l'article)
+    const { data } = matter(fileContents);
+    // Construire un objet de metadonnées
+    return {
+      // Un vrai objet Date qui sera manipulable
+      date: new Date(data.date),
+      // Le titre
+      title: data.title,
+      // Le slug sera le nom de fichier sans le .mdx
+      slug: filename.replace(/.mdx$/, ""),
+    };
+  });
+
+  // Pour l'instant les articles sont triés par nom.
+  // On va vouloir les trier par date
+  // Et ensuite reformater la date sous forme d'une
+  // String lisible par un humain
+  // pour le sort on utilise sortBy de Lodash
+  const articles = sortBy(
+    unsortedArticles,
+    // Trie par ordre décroissant de date
+    (article) => -article.date.getTime()
+  ).map((art) => ({
+    slug: art.slug,
+    // Utilise format de date-fns pour avoir une date lisible
+    date: format(art.date, "d MMM yyyy", {
+      locale: fr,
+    }),
+    title: art.title,
+  }));
+
+  // On retourne nos articles proprement formatés et trier.
+  return {
+    props: {
+      articles,
+    },
+  };
+};
+
+export default function Home({
+  articles,
+}: {
+  articles: Array<{ title: string; date: string; slug: string }>;
+}) {
+  // Ici on va se contenter d'afficher les articles
+  // tels qu'on les a reçu et dans le même ordre.
+  // Tout ce qui est couteux sera fait coté serveur
+  // pour minimiser le temps de traitement client.
+  return (
+    <>
+      {/* […] */}
+      <Layout>
+        <ArticleList articles={articles} />
+      </Layout>
+    </>
+  );
+}
+```
+
+Rappel, tout ceci sera fait uniquement coté serveur et, de plus, une et une seule fois à chaque déploiement.
+Le cout sera donc minimal et on peut se permettre d’utiliser des librairies lourdes, mais pratiques.
+Le client n'en a pas besoin et NextJs va faire en sorte qu’elles ne lui soient pas envoyées (comme elles ne sont pas utilisées dans le composant directement et se feront éliminer).
+
+##### Page d’article
+
+Pour les pages d’article on aimerait aussi utiliser un `getStaticProps` mais cependant ce qu’on y fera dépendra du `path`. De plus les pages n’ont pas une route fixe (on ne va pas s’amuser à créer des dizaines de `/pages/mon-bel-article-1.tsx`).
+
+On va donc utiliser deux mécanismes de NextJs autour des pages au path variable.
+
+1.  On va définir un fichier `/pages/[slug].tsx`. Les `[]` indiquent à NextJS que ce path sera variable et qu’il faudra rendre son contenu dans une variable nommée `slug`.
+2.  On va définir une nouvelle fonction [getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) qui va permettre a NextJS de savoir quels sont les path valides.
+
+Une fonction `getStaticPaths` ressemble à :
+
+```tsx
+export async function getStaticPaths() {
+  return {
+    // Les différentes valeurs de path valides
+    paths: ['aa', 'bb']
+    // Si l'utilisateur visite un path inconnu
+    // doit-on essayer de render
+    // une page de fallback quand même ?
+    // Je traiterai ce mechanisme dans un futur article.
+    fallback: false
+  }
+}
+```
+
+Pour traiter notre mdx on va utiliser la librairie [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote). Cette librairie expose deux fonctions importantes :
+
+1. `renderToString` qui permet de lire un ficher mdx et d'en faire une "_string_" de tag html;
+2. `hydrate` qui sera explicité plus bas.
+
+Ici dans notre page d’article :
+
+<FileName filename="pages/[slug].tsx" blogGithub />
+
+```tsx
+import fs from "fs";
+import path from "path";
+import { GetStaticProps } from "next";
+import renderToString from "next-mdx-remote/render-to-string";
+import matter from "gray-matter";
+import { MDXProvider } from "@mdx-js/react";
+import readingTime from "reading-time";
+import ArticleContainer from "../components/Article";
+
+// On va lister tous les fichier et en déduire les routes
+export async function getStaticPaths() {
+  // C'est la même chose que dans index.tsx
+  const postsDirectory = path.join(process.cwd(), "articles");
+  const filenames = fs.readdirSync(postsDirectory);
+  // Tous les fichiers donnent un slug a partir de leur nom
+  return {
+    paths: filenames.map((filename) => ({
+      params: { slug: filename.replace(/\.mdx\$/, "") },
+    })),
+    fallback: false,
+  };
+}
+
+// On remarque ici qu'on a un params slug en paramètre.
+// Celui-ci sera passé automatiquement par NextJS car
+// le fichier s'appelle [slug].tsx
+export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
+  // On lit le bon fichier a partir du slug
+  const filePath = path.join(process.cwd(), "articles", `${slug}.mdx`);
+  const fileContents = fs.readFileSync(filePath, "utf8");
+
+  // On lit les métadonnées et le contenu de l'article
+  const { content, data } = matter(fileContents);
+
+  // On transforme le contenu de l'article en un object
+  // qui va contenir, entre autre, le mdx transformé en html.
+  const mdxSource = await renderToString(content, {
+    // […] Les options et la config seront traitées plus bas.
+    scope: data,
+  });
+
+  // Transforme la date en string.
+  // Car les props étant transformées en JSON elles doivent avoir un format utilisable dans du JSON.
+  mdxSource.scope.date = mdxSource.scope.date.toString();
+
+  return {
+    props: {
+      article: {
+        mdx: mdxSource,
+        data: {
+          // On forward toutes les métadonnées de l'article
+          ...data,
+          // La date sera re-transformée en String pour plus de sureté
+          date: data.date.toString(),
+          // On utilise le plugin readingTime pour évaluer
+          // Le temps de lecture de l'article en minutes.
+          readingTime: Math.round(
+            readingTime(fileContents, { wordsPerMinute: 100 }).minutes
+          ),
+        },
+      },
+    },
+  };
+};
+
+const Article = ({ article }: { article: { mdx: any; data: any } }) => {
+  // Ce bout sera détaillé plus bas.
+  const content = process(article.mdx);
+
+  // […]
+
+  return (
+    <>
+      {/* […] */}
+      <Layout>
+        {/*
+      Le provider va permettre au plugin react/mdx
+      De render proprement l'article
+    */}
+        <MDXProvider>
+          <ArticleContainer
+            title={article.data.title}
+            timeToRead={article.data.readingTime}
+            date={article.data.date}
+          >
+            {content}
+          </ArticleContainer>
+        </MDXProvider>
+      </Layout>
+    </>
+  );
+};
+export default Article;
+```
+
+### Hydratation
+
+Dans un contexte React l’hydratation consiste à d’abord render de l’HTML et ensuite transformer celui-ci en vrais composants React.
+Comme on va vouloir avoir des composants customs “complexes” dans notre `MDX` on va vouloir transformer le HTML inactif en composants aussi vite que possible.
+
+Pour l’instant notre mdx est envoyé sous forme de string au composant qui va le recevoir.
+On va donc hydrater cette string au moment du render en lui ajoutant nos composants customs.
+
+Pour ce faire on va utiliser la méthode `hydrate` de `next-mdx-remote`.
+Le reste de l'hydratation de la page étant fait automatiquement par NextJS.
+
+<FileName filename="pages/[slug].tsx" blogGithub />
+
+```tsx
+// […]
+
+const components = {
+  // Ici on liste tous nos composants custom
+};
+
+export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
+  // […]
+
+  const { content, data } = matter(fileContents);
+  // On passe nos composants custom lors du build
+  const mdxSource = await renderToString(content, {
+    components,
+    scope: data,
+  });
+
+  // […]
+};
+
+// […]
+const Article = ({ article }: { article: { mdx: any; data: any } }) => {
+  // Notre string html est ré-hydratée avec nos composants customs.
+  const content = hydrate(article.mdx, {
+    components,
+  });
+
+  // […]
+
+  return (
+    <>
+      {/* […] */}
+      <Layout>
+        <MDXProvider>
+          <ArticleContainer
+            title={article.data.title}
+            timeToRead={article.data.readingTime}
+            date={article.data.date}
+          >
+            {content}
+          </ArticleContainer>
+        </MDXProvider>
+      </Layout>
+    </>
+  );
+};
+
+// […]
+```
+
+### Composants custom
+
+Les composants customs sont simplement des composants React classiques. Je vais lister ici ceux qui sont utilisés dans ce blog :
+
+- [Image](https://nextjs.org/docs/api-reference/next/image) : Le composant NextJS qui permet d’afficher les images de façon optimisée
+- [Youtube](https://github.com/zaratan/zarablog-next/blob/main/components/Youtube.jsx) : Un composant custom qui permet d’afficher des vidéos Youtube à partir de leur ID
+- [FileName](https://github.com/zaratan/zarablog-next/blob/main/components/FileName.tsx) : Un composant qui affiche joliment le nom des fichiers dans les exemples de code tout en étant un lien cliquable lorsque ce sont de vrais fichiers.
+- [FooterArticle](https://github.com/zaratan/zarablog-next/blob/main/components/FooterArticle.tsx) : Un composant qui contient le footer "_standard_" de mes articles.
+
+<FileName filename="pages/[slug].tsx" line="29-34" blogGithub />
+
+```tsx
+import Image from "next/image";
+import Youtube from "../components/Youtube";
+import FileName from "../components/FileName";
+import FooterArticle from "../components/FooterArticle";
+
+// […]
+
+const components = {
+  Youtube,
+  FileName,
+  Image,
+  FooterArticle,
+};
+```
+
+## MDX flavours
+
+Je vais ici décrire 2 “_saveurs_” ou add-ons de mdx que j’utilise dans mes articles de blog.
+
+### front-matter (alias : métadonnées pour chaque document `.mdx`)
+
+[front-matter](https://www.npmjs.com/package/front-matter) est une façon de décrire les métadonnées d’un article. Au début d’un document `.mdx` on va ajouter un bloc :
+
+<FileName filename="articles/next-refactor-intro.mdx" line="1-8" blogGithub />
+
+```yml
+---
+title: "NextJS Refactor: La stack."
+date: 2020-11-09T05:16:13+09:00
+categories:
+  - front
+  - code
+description: "Premier article d'une série sur les diverses techniques qui font tourner ce blog."
+---
+
+```
+
+Qui ne sera pas interprété pour construire le texte de l’article, mais permet de le décrire et est utilisé dans le reste du blog.
+
+Je le parse de cette façon :
+
+<FileName filename="pages/[slug].tsx" line="39" blogGithub />
+
+```tsx
+// content contient le corps de l'article
+// data contient les métadonnées de l'article
+// ici { title, date, categories, description }
+const { content, data } = matter(fileContents);
+```
+
+### Prism.js (alias : colorisation syntaxique des blocs de code)
+
+J’utilise [Prism.js](https://prismjs.com) pour gérer la colorisation syntaxique de mon code.
+Comme cette librairie est “_assez_” lourde, elle ne sera utilisée que du côté serveur pour ne pas pénaliser le client.
+
+Pour simplifier son utilisation `renderToString` (fonction qui va parser notre .mdx pour en faire une chaine de html/composants) de `next-mdx-remote` supporte les plugins [remark](https://remark.js.org).
+`remarkjs` est un lecteur de Markdown qui possède tout une flopée de plugins différents.
+`renderToString` va accepter les plugins `remark` pour transformer certains bouts du markdown.
+Ici pour transformer les blocks de code (ceux marqués par des \`\`\`) en un ensemble de tag html colorés.
+On va donc utiliser le plugin correspondant : [remark-prism](https://www.npmjs.com/package/remark-prism).
+
+<FileName filename="pages/[slug].tsx" line="40-56" blogGithub />
+
+```tsx
+const mdxSource = await renderToString(content, {
+  components,
+  mdxOptions: {
+    rehypePlugins: [],
+    remarkPlugins: [
+      [
+        remarkPrism,
+        // […]
+      ],
+    ],
+  },
+  scope: data,
+});
+```
+
+On pourra trouver le (s)css correspondant à la coloration syntaxique ici : [/styles/Code.scss](https://github.com/zaratan/zarablog-next/blob/main/styles/Code.scss).
+
+## Conclusion
+
+Vous devriez être maintenant capables de traiter des `mdx` dans vos applications NextJS.
+On en a aussi profité pour voir un peu comment NextJS gérait la génération des pages statiques.
+
+C'est pas mal de petits bouts différents a faire marcher ensemble.
+Ça m'a pris beaucoup de temps à comprendre, trouver et agencer les différentes librairies pour qu'elles fonctionnent les unes avec les autres
+(Au point d'avoir du faire une [PR vers remark-prism](https://github.com/sergioramos/remark-prism/pull/44)).
+Je n'avais à l'époque pas trouvé de bon article détaillant comment faire, j'espère que ce post couvrira une partie de ce besoin.
+
+<FooterArticle prId={9} />
+
+Pour aller plus loin:
+
+- La documentation de NextJS autour des [pages](https://nextjs.org/docs/basic-features/pages) et de leurs [props](https://nextjs.org/docs/basic-features/data-fetching).
+- [La page d'accueil sur le mdx](https://mdxjs.com).
+- La documentation de [RemarkJS](https://remark.js.org) et de [PrismJS](https://prismjs.com).

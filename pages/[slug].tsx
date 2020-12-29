@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
+import FooterArticle from '../components/FooterArticle';
 import ArticleContainer from '../components/Article';
 
 export async function getStaticPaths() {
@@ -29,6 +30,7 @@ const components = {
   Youtube,
   FileName,
   Image,
+  FooterArticle,
 };
 
 export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
@@ -40,6 +42,8 @@ export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
     mdxOptions: {
       rehypePlugins: [],
       remarkPlugins: [
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         [
           remarkPrism,
           {

@@ -41,6 +41,9 @@ pre[class*="language-"] {
   word-wrap: normal;
 
   line-height: 1.5;
+  @media (max-width: 500px) {
+    line-height: 1.1;
+  }
 
   -moz-tab-size: 4;
   -o-tab-size: 4;

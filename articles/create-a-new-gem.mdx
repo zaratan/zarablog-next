@@ -21,13 +21,137 @@ Tout d'abord, comment on "crée" une gem ? La bonne question est, qu'est-ce qu'e
 - Un fichier en `.gemspec`
   Donc par rapport à un script normal, tout ce qui change c'est le fichier `.gemspec`. On va détailler ses différentes sections [plus bas](#le-fichier-.gemspec) dans cet article.
 
+Cependant on peut utiliser un utilitaire qui va nous créer un squelette un peu moins "vide". [bundler](https://bundler.io/v2.2/man/bundle-gem.1.html) que vous avez tous déjà utilisé permet de créer un bon premier squelette.
+
+La commande que j'utilise la plupart du temps est:
+bundle gem nom_de_ma_gem --coc --mit --test=rspec
+
+- `--coc` va créer un fichier de code of conduct.
+- `--mit` va ajouter le fichier de license de [MIT].
+- `--test=rspec` va instancier les quelques fichiers par défaut de `rspec`.
+
+Dans la section suivante on va détailler les différentes parties de cette arborescence.
+
 ### Arborescence par défaut
+
+Voilà l'arborescence crée par bundler:
+
+<Image
+  src="/articles/create-a-new-gem/tree-new-gem.png"
+  alt="Arborescence des différents fichiers d'une nouvelle gem."
+  height="656"
+  width="644"
+/>
+
+- `CODE_OF_CONDUCT.md` contient un coc minimaliste.
+- `LICENSE.txt` va contenir la license MIT pour votre gem.
+- `Rakefile` va contenir les taches de déploiement d'une gem.
+- `lib/ma_belle_gem.rb` va contenir le fichier vide qui contiendra plus tard le code d'initialisation de votre gem. Ce fichier sera automatiquement require quand quelqu'un ajoutera votre gem à son Gemfile.
+- `lib/ma_belle_gem/version.rb` va définir la constante MaBelleGem::VERSION qui contiendra le numéro de version courant de votre gem.
+- le dossier `spec` va contenir les quelques fichiers classique de tests en rspec.
+- le dossier `bin` va contenir les scripts utiles au development.
+  - `setup` va servir à setup l'environment de development (en général juste `bundle install`).
+  - `console` va lancer une console ruby avec votre gem pre-chargée.
 
 ##### le fichier .gemspec
 
-##### le fichier de version
+Le fichier `.gemspec` est particulier et possède de nombreuses sections plus-ou-moins optionnelles. On va décortiquer celui qui est généré par `bundler`, mais vous pouvez aller voir [ici pour la documentation complète](https://guides.rubygems.org/specification-reference/).
+
+```ruby
+# Charge votre fichier qui défini la version de votre gem dans la constante MaBelleGem::VERSION.
+require_relative 'lib/ma_belle_gem/version'
+
+Gem::Specification.new do |spec|
+  # Le nom de votre gem (Obligatoire). Ce nom sera utilisé pour:
+  # * Le nom de votre gem dans rubygems;
+  # * Le nom du fihcier qui sera chargé par défaut (lib/ma_belle_gem.rb).
+  spec.name          = "ma_belle_gem"
+  # Votre numéro de version. Sa valeur sera utilisée dans rubygems. (Obligatoire)
+  spec.version       = MaBelleGem::VERSION
+  # La liste des auteurs de la gem (Obligatoire d'avoir au moins un auteur)
+  spec.authors       = ["Denis <Zaratan> Pasin"]
+  # La liste des emails des auteurs de la gem.
+  # Attention cette information est publique sur rubygems. (Obligatoire d'avoir au moins un email)
+  spec.email         = ["zaratan@hey.com"]
+
+  # summary doit contenir un rapide résumé de ce que fait votre gem.
+  # Je ne suis pas sur de où cette information est utilisée. (Obligatoire)
+  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
+  # description doit contenir une "longue" description de ce à quoi sert votre gem.
+  # Cette information sera affichée tel quelle sur rubygems. (Optionel (mais pas vraiment en pratique))
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  # En général la homepage sera votre repo github a moins que vous ne créiez un site dédié à votre gem.
+  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  # Le shortname de la license
+  spec.license       = "MIT"
+  # La version de Ruby minimale.
+  # Je vous conseille de set cette version à la dernière version de Ruby qui n'est pas en EOL (End Of Life).
+  # Voir: https://www.ruby-lang.org/en/downloads/
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.3.0")
+
+  # Section optionnelle. Si ce n'est pas scécifié c'est rubygems.org (en général je supprime cette section).
+  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+
+  spec.metadata["homepage_uri"] = spec.homepage
+  # L'url de l'emplacement de votre code
+  spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."
+  # L'url qui permet d'acceder à votre changelog. Cette section est optionnelle. Si vous n'avez pas de changelog supprimez la.
+  spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+
+  # La section files va permettre de
+  # supprimer des fichier qui ne doivent pas être inclus dans la release de votre gem (genre les tests).
+  # En général cette section reste inchangée.
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  spec.files         = Dir.chdir(File.expand_path('..', __FILE__)) do
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  end
+  # Le dossier dans lequel les executable seront mis
+  # (par exemple `bundle` pour la gem de bundler et `rails` pour la gem de rails)
+  # Ce dossier peut ne pas exister.
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  # Quels dossier seront "require" automatiquement au démarrage de votre gem.
+  # Pareil en général, pas de changement ici.
+  spec.require_paths = ["lib"]
+end
+```
+
+Les deux types de commades qui seront très souvent présentes dans un gemspec sont:
+
+- `spec.add_development_dependency`
+
+Va ajouter une gem qui ne sera installée que dans le contexte du development de la gem (`rspec` par exemple). La syntaxe est la même que dans un Gemfile :
+
+```ruby
+spec.add_development_dependency "rubocop", "> 0.58"
+```
+
+- `spec.add_dependency`
+
+Va ajouter une dépendence directe de votre gem. Celle-ci sera installée par tous les projets qui utilisent votre gem.
+
+Pareil, même syntaxe que dans un Gemfile :
+
+```ruby
+spec.add_dependency "activesupport", "> 2.0"
+```
 
 ### Le déploiement
+
+Une fois que votre gemspec est défini on peut déployer sur [rubygems.org](https://rubygems.org) et rentre notre gem disponible au monde.
+
+Il faut absolument avoir un compte de créé sur rubygems.org.
+
+Ensuite, si vous avez utilisé `bundler` pour créer votre gem. Il suffit de faire: `rake release` dans un terminal et Rake s'occupera pour vous de la publication.
+À savoir:
+
+- Creer un package avec le code de votre gem.
+- Creer un [tag git](https://git-scm.com/book/en/v2/Git-Basics-Tagging) avec votre numéro de version.
+- Faire un `git push` avec vos commits et vos tags.
+- Publier votre gem sur rubygems (Il est possible/probable que vous deviez entrer votre username/password ici).
+
+Et voilà. Après quelques minutes, n'importe qui pourra utiliser votre gem.
 
 ## Des outils pratiques
 

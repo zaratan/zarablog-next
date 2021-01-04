@@ -9,7 +9,6 @@ import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
 import remarkPrism from 'remark-prism';
 import Image from 'next/image';
-import slugify from 'slugify';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';

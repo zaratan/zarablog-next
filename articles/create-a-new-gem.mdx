@@ -428,7 +428,57 @@ Et voilà !
 
 ### Yard
 
+Il est souvent bon d’écrire une documentation des différentes méthode à même notre code et ce pour plusieurs raisons:
+* Ça permet aux autres personnes qui voudraient utiliser notre gem de savoir ce a quoi servent les différentes classes et méthodes
+* Ça permet à solargraph de faire de l’autocompletion
+
+Pour ce faire on va utiliser une gem classique: [Yard](https://github.com/lsegal/yard).
+
+Comme d’habitude on l’ajoute au `.gemspec`
+
+```ruby
+spec.add_development_dependency "yard"
+```
+
+Et ensuite on va documenter chaque méthode de la manière suivante:
+
+```ruby
+# Use a context and inject its content at this place in the code
+#
+# @param [String, Symbol] context_name The context namespace
+# @param [*Any] args Any arg to be passed down to the injected context
+# @param [String, Symbol] namespace namespace name where to look for the context
+# @param [String, Symbol] ns Alias for :namespace
+# @param block Content that will be re-injected (see #execute_tests)
+def in_context(context_name, *args, namespace: nil, ns: nil, &block)
+```
+
+Je vous laisse vous référer à [la documentation de Yard](https://rubydoc.info/gems/yard/file/docs/GettingStarted.md#docing) pour plus d’informations.
+
 ### Zeitwerk
+
+Le dernier outil que j’utilise par défaut dans quasiment toutes les gems est [Zeitwerk](https://github.com/fxn/zeitwerk). Dès que notre gem contient un peu plus de 3 fichiers, faire les require à la main de chacun de ceux-ci en haut du premier fichier de notre gem peut vite devenir un cauchemar (car certains fichiers vont dépendre sur d’autres et vont donc devoir être require avant, etc…).
+
+Zeitwerk permet de simplifier ce processus en faisant un autoload à la Rails sur nos fichiers. Il suffira ensuite que chaque fichier définisse la constante correspondant au path et nom du fichier pour que Zeitwerk s’occupe de faire des require automatique.
+
+Sa configuration est assez simple.
+
+On l’ajoute au `.gemspec` :
+```ruby
+spec.add_dependency 'zeitwerk', '~> 2' 
+```
+
+Et ensuite, suivant la [documentation](https://github.com/fxn/zeitwerk#for_gem), dans notre fichier principal presque tout en haut on fait:
+
+<FileName external baseUrl="https://github.com/zaratan/activeshotgun/blob/main/" filename="lib/activeshotgun.rb" />
+
+```ruby
+require "zeitwerk"
+loader = Zeitwerk::Loader.for_gem
+loader.setup # ready!
+```
+
+Et c’est tout. Les différents fichiers seront require correctement.
 
 ## Des bonnes pratiques
 

@@ -429,8 +429,9 @@ Et voilà !
 ### Yard
 
 Il est souvent bon d’écrire une documentation des différentes méthode à même notre code et ce pour plusieurs raisons:
-* Ça permet aux autres personnes qui voudraient utiliser notre gem de savoir ce a quoi servent les différentes classes et méthodes
-* Ça permet à solargraph de faire de l’autocompletion
+
+- Ça permet aux autres personnes qui voudraient utiliser notre gem de savoir ce a quoi servent les différentes classes et méthodes
+- Ça permet à solargraph de faire de l’autocompletion
 
 Pour ce faire on va utiliser une gem classique: [Yard](https://github.com/lsegal/yard).
 
@@ -464,13 +465,18 @@ Zeitwerk permet de simplifier ce processus en faisant un autoload à la Rails su
 Sa configuration est assez simple.
 
 On l’ajoute au `.gemspec` :
+
 ```ruby
-spec.add_dependency 'zeitwerk', '~> 2' 
+spec.add_dependency 'zeitwerk', '~> 2'
 ```
 
 Et ensuite, suivant la [documentation](https://github.com/fxn/zeitwerk#for_gem), dans notre fichier principal presque tout en haut on fait:
 
-<FileName external baseUrl="https://github.com/zaratan/activeshotgun/blob/main/" filename="lib/activeshotgun.rb" />
+<FileName
+  external
+  baseUrl="https://github.com/zaratan/active_shotgun/blob/main/"
+  filename="lib/activeshotgun.rb"
+/>
 
 ```ruby
 require "zeitwerk"

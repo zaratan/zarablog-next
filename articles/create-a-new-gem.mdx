@@ -308,7 +308,125 @@ Je laisse a solargraph le travail d’appeller Rubocop avec `formatting` et `dia
 
 ### Bundle audit et Bundle outdated
 
+Des fois on veut pouvoir vérifier directement en console l’état de nos dépendences. Pour ce faire, on va utiliser deux outils.
+
+##### bundle outdated
+
+Cette commande vient de base avec bundler et lui permet de lister toutes les gems de notre `Gemfile.lock` qui ne sont pas à jour. De plus ça nous indique pour chaque `gem` quelle est la version à jour vers laquelle update. Il ne reste alors plus qu’a faire `bundle update`
+
+##### bundle audit
+
+[Bundle audit](https://github.com/rubysec/bundler-audit) est une extension de bundler qui permet de vérifier si une de nos gems à une faille de sécurité connue (CVE). On utilise la gem de cette manière:
+
+On l’ajoute au `.gemspec`:
+
+```ruby
+spec.add_development_dependency "bundle-audit"
+```
+
+Puis:
+
+```bash
+# Met à jour ta liste des CVEs
+bundle audit update
+# Vérifie si une de mes gems à une CVE connue
+bundle audit
+```
+
 ### Overcommit
+
+On a déjà plein d’outils de qualité de code qu’on aimerait lancer automatiquement pour éviter de les oublier. Pour cela on va utiliser la gem [overcommit](https://github.com/sds/overcommit). Elle permet de facilement définir une liste de taches à lancer avant chaque `commit` ou `push` git.
+
+Comme d’habitude on ajoute la gem à notre `.gemspec`
+
+```ruby
+spec.add_development_dependency "overcommit"
+```
+
+On va ensuite “installer” les git hooks:
+
+```bash
+bundle exec overcommit -i
+```
+
+Enfin, on va configurer overcommit pour lui indiquer quelles actions lancer:
+
+<FileName filename=“.overcommit.yml” />
+
+
+```yaml
+# Avant chaque commit
+PreCommit:
+  # Lance rubocop sur les fichiers ruby qui ont changé.
+  # Si il y a un problème, empêche le commit.
+  RuboCop:
+    enabled: true
+    # Utilise le mode rapide de rubocop
+    command: ["rubocop", "-P"]
+    quiet: false
+  # Vérifie si il y a des gems outdated et affiche un warning sinon
+  BundleOutdated:
+    enabled: true
+  # Vérifie si il y a des CVEs et bloque le commit si oui.
+  BundleAudit:
+    enabled: true
+
+# Avant chaque push
+PrePush:
+  # Lance rspec et empêche le push si il y a un problème.
+  RSpec:
+    enabled: true
+    command: ["rspec", "-f", "p"]
+    quiet: false
+```
+
+Et c’est tout.
+
+On ne lance pas RSpec à chaque commit car ceux-ci peuvent être très longs et on va vouloir encourager de petits commits. Si chaque commit prend 20 minutes, on ne va jamais commit.
+
+Note: A chaque fois que le fichier `.overcommit.yml` change pour des raisons de sécurité on va devoir faire `bundle exec overcommit --sign`
+
+##### Bonus: lancer rubocop (rapide) sur l’ensemble du projet avant le push
+
+À l’heure où cet article est écrit, il n’existe pas de façon pré-écrite de lancer Rubocop sur tous les fichiers avant chaque `push`. Voilà une recette pour remédier au problème:
+
+On ajoute le fichier:
+
+<FileName filename=“.git-hooks/pre_push/rubocop.rb” />
+
+
+```ruby
+# frozen_string_literal: true
+
+module Overcommit
+  module Hook
+    module PrePush
+      # Runs `rubocop` on every files.
+      class Rubocop < Base
+        def run
+          result = execute(['rubocop', '-P'])
+          return :pass if result.success?
+
+          output = result.stdout + result.stderr
+          [:fail, output]
+        end
+      end
+    end
+  end
+end
+```
+
+Et ensuite on modifie notre `.overcommit.yml`
+
+```yaml
+# Avant chaque push
+PrePush:
+  # […]
+  Rubocop:
+    enabled: true
+```
+
+Et voilà !
 
 ### Yard
 

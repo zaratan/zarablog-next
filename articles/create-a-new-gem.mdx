@@ -271,6 +271,41 @@ alias fastcop="rubocop -P -f fi | xargs rubocop -A"
 
 ### Solargraph
 
+[Solargraph](https://solargraph.org)est une gem qui permet d’ajouter un “Language Server” à votre projet Ruby. Qu’est ce qu’un language server me direz vous ? C’est un utilitaire qui va tourner en tache de fond et permettre a votre IDE de lui poser des questions telles que: “Quelle est la documentation de cette méthode ?” ou “Quelles sont les méthodes disponibles sur cet classe/objet ?” ou encore “Quels sont les arguments de cette méthode ?”. Ça permet ensuite à notre IDE de fournir une bien meilleure autocomplétion.
+
+On l’ajoute à notre projet de la manière suivante:
+
+```ruby
+spec.add_development_dependency "solargraph"
+```
+
+Et on peut ensuite demander à solargraph de télécharger les documentations disponibles.
+
+```bash
+# Télécharge la documentation de tel ruby
+solargraph download-core 2.7.2
+
+# Compile la documentation de toutes les gems
+# utilisées dans le projet
+solargraph bundle
+```
+
+Chaque IDE a sa propre façon de se connecter à solargraph. Le comment lier son IDE a solargraph [sera laissé en exercice au lecteur](https://solargraph.org).
+
+##### Bonus VS Code configuration
+
+Je vais quand même fournir quelques options de configuration que j’utilise pour solargraph à l’intérieur de VS Code.
+
+```json
+"solargraph.diagnostics": true,
+"solargraph.formatting": true,
+"solargraph.completion": true,
+"solargraph.folding": true,
+"solargraph.hover": true,
+```
+
+Je laisse a solargraph le travail d’appeller Rubocop avec `formatting` et `diagnostics`. Ou de savoir comment “replier” le code avec `folding`. L’autocompletion s’active avec `completion`. Et `hover` permet d’afficher les informations des méthodes en cas de hover.
+
 ### Bundle audit et Bundle outdated
 
 ### Overcommit

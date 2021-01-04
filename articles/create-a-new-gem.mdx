@@ -19,13 +19,14 @@ Tout d'abord, comment on "crée" une gem ? La bonne question est, qu'est-ce qu'e
 
 - Un dossier duquel on va pouvoir require des fichiers ruby
 - Un fichier en `.gemspec`
- Donc par rapport à un script normal, tout ce qui change c'est le fichier `.gemspec`. On va détailler ses différentes sections [plus bas](#le-fichier-.gemspec) dans cet article.
+  Donc par rapport à un script normal, tout ce qui change c'est le fichier `.gemspec`. On va détailler ses différentes sections [plus bas](#le-fichier-.gemspec) dans cet article.
 
 Cependant on peut utiliser un utilitaire qui va nous créer un squelette un peu moins "vide". [Bundler](https://bundler.io/v2.2/man/bundle-gem.1.html) que vous avez tous déjà utilisé permet de créer un bon premier squelette.
 
 La commande que j'utilise la plupart du temps est :
+
 ```bash
-bundle gem nom\_de\_ma\_gem --coc --mit --test=rspec
+bundle gem nom_de_ma_gem --coc --mit --test=rspec
 ```
 
 - `--coc` va créer un fichier de code of conduct.
@@ -159,18 +160,22 @@ Voilà. Après quelques minutes, n'importe qui pourra utiliser votre gem.
 
 ## Des outils pratiques
 
-Dans la partie précédente on a pu voir ce qu’il fallait pour avoir une gem minimale. On va maintenant passer en revue quelques outils (gems) que j’inclus dans quasiment toutes les gems que j’utilise. Notez que quasiment toutes ces recommandations s’appliqueraient aussi à un projet Rails. Ces outils ne sont effectivement pas du tout liés au processus de création d’une gem. 
+Dans la partie précédente on a pu voir ce qu’il fallait pour avoir une gem minimale. On va maintenant passer en revue quelques outils (gems) que j’inclus dans quasiment toutes les gems que j’utilise. Notez que quasiment toutes ces recommandations s’appliqueraient aussi à un projet Rails. Ces outils ne sont effectivement pas du tout liés au processus de création d’une gem.
 
 ### Rubocop
 
-Commençons par [Rubocop](https://rubocop.org)que vous devez tous plus ou moins connaitre. Pour moi, c’est plus ou moins obligatoire de l’utiliser dans un projet (Ou un “_équivalent_” genre [reek](https://github.com/troessner/reek)). 
+Commençons par [Rubocop](https://rubocop.org) que vous devez tous plus ou moins connaitre.
+Pour moi, c’est plus ou moins obligatoire de l’utiliser dans un projet
+(Ou un “_équivalent_” genre [reek](https://github.com/troessner/reek)).
 
 Utiliser rubocop permet plusieurs choses :
-* C’est une façon de normaliser le style du code à travers un projet. Ça permet d’ouvrir n’importe quel fichier et d’avoir un “style” consistant.
-* Ça règle toute discussion futile autour du style dans une PR. Si le linter ne force pas un style, alors cette façon de coder est valide.
-* Ça permet de s’assurer que certaines règles de performance sont respectées, que certaines syntaxes dangereuses ne sont pas utilisées ou encore que certaine erreurs évitables le sont.
+
+- C’est une façon de normaliser le style du code à travers un projet. Ça permet d’ouvrir n’importe quel fichier et d’avoir un “style” consistant.
+- Ça règle toute discussion futile autour du style dans une PR. Si le linter ne force pas un style, alors cette façon de coder est valide.
+- Ça permet de s’assurer que certaines règles de performance sont respectées, que certaines syntaxes dangereuses ne sont pas utilisées ou encore que certaine erreurs évitables le sont.
 
 Pour ajouter Rubocop à notre gem on ajoute dans le `.gemspec` :
+
 ```ruby
 spec.add_development_dependency "rubocop"
 spec.add_development_dependency "rubocop-performance"
@@ -186,7 +191,7 @@ inherit_from:
   - http://relaxed.ruby.style/rubocop.yml
 
 # Ajoute des règles de performance aux règles de base de Rubocop
-require: 
+require:
   - rubocop-performance
 
 AllCops:
@@ -196,17 +201,17 @@ AllCops:
   DisplayStyleGuide: true
   DisplayCopNames: true
   Exclude:
-    - 'bin/*'
-    - 'vendor/**/*'
+    - "bin/*"
+    - "vendor/**/*"
 
 # Certains fichiers sont de gigantesques block.
 # Ne pas les compter.
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*.rb'
-    - 'Guardfile'
-    - 'vendor/bundle'
-    - '*.gemspec'
+    - "spec/**/*.rb"
+    - "Guardfile"
+    - "vendor/bundle"
+    - "*.gemspec"
 
 # Les règles qui vont suivre sont des règles de style
 # permettant de split les lignes.
@@ -258,8 +263,9 @@ Layout/LineLength:
 ##### Bonus : Autocorrect rapide
 
 Il arrive souvent qu’on veuille lancer Rubocop sur l’ensemble du projet et corriger chaque fichier qui a un problème. Rubocop à deux options mutuellement exclusives :
-* `-P` permet de vérifier les fichiers en parallèle et donc de profiter des nombreux cœurs de nos CPU modernes
-* `-A` permet de corriger les fichiers automatiquement.
+
+- `-P` permet de vérifier les fichiers en parallèle et donc de profiter des nombreux cœurs de nos CPU modernes
+- `-A` permet de corriger les fichiers automatiquement.
 
 Comme on ne peut pas utiliser les deux options en même temps on va définir un alias qui utilise automatiquement le résultat de du mode rapide (`-P`) comme paramètre du mode (`-A`) et ne corriger (lentement) que les fichiers qui ont des problèmes.
 
@@ -269,9 +275,10 @@ alias fastcop="rubocop -P -f fi | xargs rubocop -A"
 
 ### Solargraph
 
-[Solargraph](https://solargraph.org)est une gem qui permet d’ajouter un “Language Server” à votre projet Ruby. Qu’est-ce qu’un language server me direz-vous ? C’est un utilitaire qui va tourner en tache de fond et permettre a votre IDE de lui poser des questions telles que : “Quelle est la documentation de cette méthode ?” ou “Quelles sont les méthodes disponibles sur cet classe/objet ?” ou encore “Quels sont les arguments de cette méthode ?”. Ça permet ensuite à notre IDE de fournir une bien meilleure autocomplétion.
+[Solargraph](https://solargraph.org) est une gem qui permet d’ajouter un “Language Server” à votre projet Ruby. Qu’est-ce qu’un language server me direz-vous ? C’est un utilitaire qui va tourner en tache de fond et permettre a votre IDE de lui poser des questions telles que : “Quelle est la documentation de cette méthode ?” ou “Quelles sont les méthodes disponibles sur cet classe/objet ?” ou encore “Quels sont les arguments de cette méthode ?”. Ça permet ensuite à notre IDE de fournir une bien meilleure autocomplétion.
 
 On l’ajoute à notre projet de la manière suivante :
+
 ```ruby
 spec.add_development_dependency "solargraph"
 ```
@@ -301,7 +308,7 @@ Je vais quand même fournir quelques options de configuration que j’utilise po
 "solargraph.hover": true,
 ```
 
-Je laisse à solargraph le travail d’appeler Rubocop avec `formatting` et `diagnostics`. Ou de savoir comment “replier” le code avec `folding`. L’autocomplétion s’active avec `completion`. Et `hover` permet d’afficher les informations des méthodes en cas de hover. 
+Je laisse à solargraph le travail d’appeler Rubocop avec `formatting` et `diagnostics`. Ou de savoir comment “replier” le code avec `folding`. L’autocomplétion s’active avec `completion`. Et `hover` permet d’afficher les informations des méthodes en cas de hover.
 
 ### Bundle audit et Bundle outdated
 
@@ -322,6 +329,7 @@ spec.add_development_dependency "bundle-audit"
 ```
 
 Puis :
+
 ```bash
 # Met à jour ta liste des CVEs
 bundle audit update
@@ -334,6 +342,7 @@ bundle audit
 On a déjà plein d’outils de qualité de code qu’on aimerait lancer automatiquement pour éviter de les oublier. Pour cela on va utiliser la gem [overcommit](https://github.com/sds/overcommit). Elle permet de facilement définir une liste de taches à lancer avant chaque `commit` ou `push` git.
 
 Comme d’habitude on ajoute la gem à notre `.gemspec`
+
 ```ruby
 spec.add_development_dependency "overcommit"
 ```
@@ -356,7 +365,7 @@ PreCommit:
   RuboCop:
     enabled: true
     # Utilise le mode rapide de rubocop
-    command: ['rubocop', '-P']
+    command: ["rubocop", "-P"]
     quiet: false
   # Vérifie si il y a des gems outdated et affiche un warning sinon
   BundleOutdated:
@@ -370,7 +379,7 @@ PrePush:
   # Lance rspec et empêche le push si il y a un problème.
   RSpec:
     enabled: true
-    command: ['rspec', '-f', 'p']
+    command: ["rspec", "-f", "p"]
     quiet: false
 ```
 
@@ -406,7 +415,7 @@ module Overcommit
       end
     end
   end
-end 
+end
 ```
 
 Ensuite on modifie notre `.overcommit.yml`
@@ -424,8 +433,9 @@ Voilà !
 ### Yard
 
 Il est souvent bon d’écrire une documentation des différentes méthodes à même notre code et ce pour plusieurs raisons :
-* Ça permet aux autres personnes qui voudraient utiliser notre gem de savoir ce à quoi servent les différentes classes et méthodes
-* Ça permet à solargraph de faire de l’autocomplétion
+
+- Ça permet aux autres personnes qui voudraient utiliser notre gem de savoir ce à quoi servent les différentes classes et méthodes
+- Ça permet à solargraph de faire de l’autocomplétion
 
 Pour ce faire on va utiliser une gem classique : [Yard](https://github.com/lsegal/yard).
 
@@ -459,13 +469,18 @@ Zeitwerk permet de simplifier ce processus en faisant un autoload à la Rails su
 Sa configuration est assez simple.
 
 On l’ajoute au `.gemspec` :
+
 ```ruby
-spec.add_dependency 'zeitwerk', '~> 2' 
+spec.add_dependency 'zeitwerk', '~> 2'
 ```
 
 Ensuite, suivant la [documentation](https://github.com/fxn/zeitwerk#for_gem), dans notre fichier principal presque tout en haut on fait :
 
-<FileName external baseUrl="https://github.com/zaratan/active\_shotgun/blob/main/" filename="lib/active\_shotgun.rb" />
+<FileName
+  external
+  baseUrl="https://github.com/zaratan/active_shotgun/blob/main/"
+  filename="lib/active_shotgun.rb"
+/>
 
 ```ruby
 require "zeitwerk"
@@ -477,7 +492,7 @@ C'est tout. Les différents fichiers seront require correctement.
 
 ## Des bonnes pratiques
 
-Je ne vais pas m’étendre ici sur le pourquoi écrire des tests est crucial pour une gem qui va ensuite être utilisé par plein de gens. Écrivez. Des. Tests. 
+Je ne vais pas m’étendre ici sur le pourquoi écrire des tests est crucial pour une gem qui va ensuite être utilisé par plein de gens. Écrivez. Des. Tests.
 
 On va voir quelques points qu’il est, je pense, important de traiter.
 
@@ -485,7 +500,7 @@ On va voir quelques points qu’il est, je pense, important de traiter.
 
 Si vous comptez sur le fait que votre gem soit utilisée par d’autres personnes, il est important de leur fournir un moyen de savoir ce qu’y change entre chaque version de votre gem. Pour cela, le plus simple est de maintenir un fichier `CHANGELOG.md` à la racine de votre gem.
 
-De plus, n’oubliez pas d’ajouter l’url menant à celui-ci dans votre `.gemspec`. 
+De plus, n’oubliez pas d’ajouter l’url menant à celui-ci dans votre `.gemspec`.
 
 ```ruby
 spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
@@ -495,7 +510,7 @@ Pour ce qui est du format de changelog, je conseille de suivre le très bon (et 
 
 ### Écrire de la documentation
 
-On a déjà parlé de documentation à l’intérieur du code avec [Yard](#yard). Pensez aussi à compléter votre Readme avec des cas d’usage classiques (voir toute la documentation si la gem est simple) avec des liens vers d’autres fichiers en `.md` ou des pages web si nécéssaire. 
+On a déjà parlé de documentation à l’intérieur du code avec [Yard](#yard). Pensez aussi à compléter votre Readme avec des cas d’usage classiques (voir toute la documentation si la gem est simple) avec des liens vers d’autres fichiers en `.md` ou des pages web si nécéssaire.
 
 Rappelez-vous : Si y a pas de doc ou si elle est nulle, il faut **VRAIMENT** que les gens n’aient pas le choix pour utiliser votre outil.
 
@@ -517,12 +532,15 @@ Partant de ce constat, les 3 actions seront :
 - Sur chaque PR à destination de `main` on vérifie que le numéro de version a bien changé et que ce numéro de version est bien supérieur au précédent.
 - Sur chaque commit dans `main`, on commence par lancer les tests dans toutes les versions de ruby. Si ces tests passent et que la version a été changée (ce qui devrait toujours être le cas), on va déployer notre nouvelle version de gem.
 
-
 ##### Vérifier la version sur chaque PR vers `main`
 
 Pour ajouter des [actions Github](https://github.com/features/actions), rien de plus simple. On crée dans le dossier `.github/workflows/` des fichiers correspondant à nos actions.
 
-<FileName filename=".github/workflows/verify\_version\_change.yml" external baseUrl="https://github.com/zaratan/rspec\_in\_context/blob/main/" />
+<FileName
+  filename=".github/workflows/verify_version_change.yml"
+  external
+  baseUrl="https://github.com/zaratan/rspec_in_context/blob/main/"
+/>
 
 ```yaml
 # Le nom qui sera affiché lors de l'exécution de notre action
@@ -538,12 +556,12 @@ on:
 jobs:
   version_change:
     runs-on: ubuntu-latest
-	
-	# Les étapes de l'action
+
+    # Les étapes de l'action
     steps:
-      # on récupère le code 
+      # on récupère le code
       - uses: actions/checkout@v2
-      # On fetch la branche principale 
+      # On fetch la branche principale
       # (pour pouvoir faire des comparaison avec la branche courante).
       - name: Fetch main branch
         run: git fetch origin main:main
@@ -554,7 +572,7 @@ jobs:
       # Pour éventuellement débug
       - name: Print new version
         run: 'git diff main -- lib/rspec_in_context/version.rb | grep -E "^\+.*VERSION" | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?"'
-      # Magie noire en bash pour vérifier que 
+      # Magie noire en bash pour vérifier que
       # le numéro de version est bien plus grand.
       - name: Verify if higher version
         run: '[[ $(git diff main -- lib/rspec_in_context/version.rb | grep -E "^\+.*VERSION" | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?") > $(git diff main -- lib/rspec_in_context/version.rb | grep -E "^-.*VERSION" | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?") ]]'
@@ -564,14 +582,18 @@ jobs:
 
 Ici pour lancer les tests sur toutes les versions de ruby on va utiliser une [matrice](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix) :
 
-<FileName filename=".github/workflows/test\_only.yml" external baseUrl="https://github.com/zaratan/rspec\_in\_context/blob/main/" />
+<FileName
+  filename=".github/workflows/test_only.yml"
+  external
+  baseUrl="https://github.com/zaratan/rspec_in_context/blob/main/"
+/>
 
 ```yaml
 name: Tests
 
 on:
   push:
-    branches-ignore: 
+    branches-ignore:
       - main
 
 jobs:
@@ -584,35 +606,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    # Cette action va setup le bon ruby et installer les gems.
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        # On va chercher la version de ruby dans la matrice
-        ruby-version: ${{ matrix.ruby }}
-        # On cache l'instalation des gems 
-        bundler-cache: true
-    # On lance rubocop
-    - name: Run linter
-      run: bundle exec rubocop
-    # On lance les tests
-    - name: Run tests
-      run: bundle exec rspec
+      - uses: actions/checkout@v2
+      # Cette action va setup le bon ruby et installer les gems.
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          # On va chercher la version de ruby dans la matrice
+          ruby-version: ${{ matrix.ruby }}
+          # On cache l'instalation des gems
+          bundler-cache: true
+      # On lance rubocop
+      - name: Run linter
+        run: bundle exec rubocop
+      # On lance les tests
+      - name: Run tests
+        run: bundle exec rspec
 ```
 
 ##### Lancer les tests et déployer au besoin sur les push dans la branche `main`
 
 Cette fois-ci on va utiliser encore un nouvel outil des actions Github. On va utiliser la notion de [dépendances entre jobs](https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idneeds). De plus on va utiliser les [secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets) pour stocker notre clé API de rubygems.
 
-<FileName filename=".github/workflows/verify\_version\_change.yml" external baseUrl="https://github.com/zaratan/rspec\_in\_context/blob/main/" />
+<FileName
+  filename=".github/workflows/verify_version_change.yml"
+  external
+  baseUrl="https://github.com/zaratan/rspec_in_context/blob/main/"
+/>
 
 ```yaml
 ame: Test and Release
 
 on:
   push:
-    branches: 
+    branches:
       - main
 
 jobs:
@@ -624,16 +650,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
-    - name: Run linter
-      run: bundle exec rubocop
-    - name: Run tests
-      run: bundle exec rspec
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run linter
+        run: bundle exec rubocop
+      - name: Run tests
+        run: bundle exec rspec
   # On a un deuxième job de release
   release:
     # On indique qu'il a besoin que le job de tests soit fini et positif
@@ -641,30 +667,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.0
-        bundler-cache: true
-    # On prépare le fichier ~/.gem/credentials 
-    # qui va permettre de s'authentifier sur rubygems
-    - name: Prepare credentials
-      env:
-        # On lit dans les secrets du repo github 
-        # pour le mettre en variable d'environment
-        RUBYGEM_KEY: ${{ secrets.RUBYGEM_KEY }}
-      run: "mkdir -p ~/.gem && echo -e \"---\\r\\n:rubygems_api_key: $RUBYGEM_KEY\" > ~/.gem/credentials && chmod 0600 ~/.gem/credentials"
-    # Comme on va créer un tag git on a besoin d'avoir choisi un email/username
-    - name: Setup username/email
-      run: "git config --global user.email zaratan@hey.com && git config --global user.name \"Denis <Zaratan> Pasin\""
-    # On récupère tous les tags existants
-    - name: Fetch tags from remote
-      run: "git fetch -t"
-    # On verifie si le fichier de version.rb à changé depuis le dernier tag
-    # Si oui, on lance rake release
-    - name: Publish if version change
-      run: 'git diff `git tag | tail -1` -- lib/rspec_in_context/version.rb | grep -E "^\+.*VERSION" && rake release || echo "No release for now"'
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+          bundler-cache: true
+      # On prépare le fichier ~/.gem/credentials
+      # qui va permettre de s'authentifier sur rubygems
+      - name: Prepare credentials
+        env:
+          # On lit dans les secrets du repo github
+          # pour le mettre en variable d'environment
+          RUBYGEM_KEY: ${{ secrets.RUBYGEM_KEY }}
+        run: "mkdir -p ~/.gem && echo -e \"---\\r\\n:rubygems_api_key: $RUBYGEM_KEY\" > ~/.gem/credentials && chmod 0600 ~/.gem/credentials"
+      # Comme on va créer un tag git on a besoin d'avoir choisi un email/username
+      - name: Setup username/email
+        run: 'git config --global user.email zaratan@hey.com && git config --global user.name "Denis <Zaratan> Pasin"'
+      # On récupère tous les tags existants
+      - name: Fetch tags from remote
+        run: "git fetch -t"
+      # On verifie si le fichier de version.rb à changé depuis le dernier tag
+      # Si oui, on lance rake release
+      - name: Publish if version change
+        run: 'git diff `git tag | tail -1` -- lib/rspec_in_context/version.rb | grep -E "^\+.*VERSION" && rake release || echo "No release for now"'
 ```
 
 ## Conclusion
@@ -674,4 +700,5 @@ Voilà, avec tout ça vous devriez être capable de créer vous-même vos propre
 <FooterArticle prId={10} />
 
 Pour aller plus loin :
-- Ma gem de [rspec\_in\_context](https://github.com/zaratan/rspec_in_context) qui utilise toutes ces techniques (sauf Zeitwerk, car il n’y a que 2-3 fichiers).
+
+- Ma gem de [rspec_in_context](https://github.com/zaratan/rspec_in_context) qui utilise toutes ces techniques (sauf Zeitwerk, car il n’y a que 2-3 fichiers).

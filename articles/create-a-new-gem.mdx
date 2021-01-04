@@ -1,0 +1,69 @@
+---
+title: "Anatomie d'une gem Ruby"
+date: 2020-12-30T12:33:13+09:00
+categories:
+  - ruby
+  - code
+description: "Cet article à pour but de couvrir tout le processus d'édition d'une gem. Il sera découpé en deux grandes parties."
+---
+
+Cet article à pour but de couvrir tout le processus d'édition d'une gem. Il sera découpé en deux grandes parties. Tout d'abord ce qu'il faut savoir à minima pour créer sa propre gem (honnêtement, pas grand chose) pour que vous puissiez créer la votre sans soucis. Je vais ensuite donner mes recommandations (subjectives) quand aux outils et bonnes pratiques concernant l'écriture et le maintient de cette gem.
+
+## Savoir minimal
+
+Tout d'abord on va voir ce qu'il faut savoir à minima. Ce "chapitre" va essayer de couvrir tout ce qui rend différent une gem d'un script ruby qu'on écrit dans un coin.
+
+### Création d'une nouvelle gem
+
+Tout d'abord, comment on "crée" une gem ? La bonne question est, qu'est-ce qu'est le "minimal" pour avoir une gem ?
+
+- Un dossier duquel on va pouvoir require des fichiers ruby
+- Un fichier en `.gemspec`
+  Donc par rapport à un script normal, tout ce qui change c'est le fichier `.gemspec`. On va détailler ses différentes sections [plus bas](#le-fichier-.gemspec) dans cet article.
+
+### Arborescence par défaut
+
+##### le fichier .gemspec
+
+##### le fichier de version
+
+### Le déploiement
+
+## Des outils pratiques
+
+### Solargraph
+
+### Rubocop
+
+### Bundle audit et Bundle outdated
+
+### Overcommit
+
+### Yard
+
+### Zeitwerk
+
+## Des bonnes pratiques
+
+### Écrire un changelog
+
+### Écrire des tests
+
+Coverage min avec simplecov
+
+### Écrire de la documentation
+
+Readme
+Yard
+
+### Automatiser son déploiement
+
+Deploiement se fait sur rubygems
+
+`rake release`
+
+J'utilise des Github Actions pour ça
+
+##### Verifier la version et lancer les tests a chaque push
+
+##### Lancer les tests et déployer au besoin sur les push dans la branche `main`

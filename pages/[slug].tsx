@@ -14,6 +14,7 @@ import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
 import FooterArticle from '../components/FooterArticle';
 import ArticleContainer from '../components/Article';
+import { H2, H3, H4, H5 } from '../components/IdedHeaders';
 
 export async function getStaticPaths() {
   const postsDirectory = path.join(process.cwd(), 'articles');
@@ -31,6 +32,10 @@ const components = {
   FileName,
   Image,
   FooterArticle,
+  h2: H2,
+  h3: H3,
+  h4: H4,
+  h5: H5,
 };
 
 export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {

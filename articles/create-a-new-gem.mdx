@@ -155,9 +155,121 @@ Et voilà. Après quelques minutes, n'importe qui pourra utiliser votre gem.
 
 ## Des outils pratiques
 
-### Solargraph
+Dans la partie précédente on a pu voir ce qu’il fallait pour avoir une gem minimale.
+On va maintenant passer en revue quelques outils (gems) que j’inclus dans quasiment toutes les gems que j’utilise.
+Nottez que quasiment toutes ces recommandations s’appliqueraient aussi à un projet Rails.
+Ces outils ne sont effectivement pas du tout liés au processus de création d’une gem.
 
 ### Rubocop
+
+Commençons par [Rubocop](https://rubocop.org)que vous devez tous plus ou moins connaitre.
+Pour moi, c’est plus ou moins obligatoire de l’utiliser dans un projet
+(Ou un “_équivalent_” genre [reek](https://github.com/troessner/reek)).
+
+Utiliser rubocop permet plusieurs choses:
+
+- C’est une façon de normaliser le look du code à travers un projet. Ça permet d’ouvrir n’importe quel fichier et d’avoir un “style” consistant.
+- Ça règle toute discussion futile autour du style dans une PR. Si le linter ne force pas un style, alors cette façon de coder est valide.
+- Ça permet de s’assurer que certaines règles de performance sont respectées, que certaines syntaxes dangereuses ne sont pas utilisées ou encore que certaine erreurs évitables le sont.
+
+Pour ajouter Rubocop à notre gem on ajoute dans le `.gemspec` :
+
+```ruby
+spec.add_development_dependency "rubocop"
+spec.add_development_dependency "rubocop-performance"
+```
+
+Voici un exemple de configuration que j’utilise dans presque toutes mes gems:
+
+```yaml
+# Utiliser une version (peu) édulcorée des règles de base de rubocop
+inherit_from:
+  - http://relaxed.ruby.style/rubocop.yml
+
+# Ajoute des règles de performance aux règles de base de Rubocop
+require:
+  - rubocop-performance
+
+AllCops:
+  # Chaque version de rubocop ajoute de nouvelles règles.
+  # Ceci les active par défaut.
+  NewCops: enable
+  DisplayStyleGuide: true
+  DisplayCopNames: true
+  Exclude:
+    - "bin/*"
+    - "vendor/**/*"
+
+# Certains fichiers sont de gigantesques block.
+# Ne pas les compter.
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*.rb"
+    - "Guardfile"
+    - "vendor/bundle"
+    - "*.gemspec"
+
+# Les règles qui vont suivre sont des règles de style
+# permettant de split les lignes.
+Layout/DotPosition:
+  Enabled: true
+  EnforcedStyle: trailing
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Layout/MultilineArrayLineBreaks:
+  Enabled: true
+
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: true
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: true
+
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Layout/MultilineAssignmentLayout:
+  Enabled: true
+
+# Ajoute une limite maximum à la longueur d'une ligne
+Layout/LineLength:
+  Enabled: true
+  Max: 120
+  # Cette option fait en sorte que Rubocop essaye d'ajouter
+  # des retours à la ligne là où il faut.
+  AutoCorrect: true
+  Exclude:
+    - Gemfile
+    - Guardfile
+```
+
+##### Bonus: Autocorrect rapide
+
+Il arrive souvent qu’on veuille lancer Rubocop sur l’ensemble du projet et corriger chaque fichier qui a un problème. Rubocop à deux options mutuellement exclusives:
+
+- `-P` permet de vérifier les fichiers en parallèle et donc de profiter des nombreux cœurs de nos CPU modernes
+- `-A`permet de corriger les fichiers automatiquement.
+
+Comme on ne peut pas utiliser les deux options en même temps on va définir un alias qui utilise automatiquement le résultat de du mode rapide (`-P`) comme paramètre du mode (`-A`) et ne corriger (lentement) que les fichiers qui ont des problèmes.
+
+```bash
+alias fastcop="rubocop -P -f fi | xargs rubocop -A"
+```
+
+### Solargraph
 
 ### Bundle audit et Bundle outdated
 

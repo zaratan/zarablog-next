@@ -1,0 +1,36 @@
+@import "../styles/theme";
+
+.left {
+  :global(.pusher) {
+    max-width: 0px;
+  }
+}
+
+.right {
+  color: $yellow;
+  :global(.pusher) {
+    max-width: 3rem;
+  }
+}
+.slider {
+  flex-grow: 1;
+  :global(.pusher) {
+    display: inline-flex;
+    overflow: hidden;
+    transition: max-width 0.3s ease-in-out;
+  }
+}
+.container {
+  width: 3rem;
+  display: inline-flex;
+  justify-content: space-between;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease-in-out;
+  &:focus,
+  &:hover {
+    outline: none;
+    box-shadow: none;
+    opacity: 1;
+  }
+}

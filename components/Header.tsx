@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React, { useContext } from 'react';
 import { isBrowser } from 'react-device-detect';
 import { FaSun, FaMoon, FaUser, FaHome } from 'react-icons/fa';
+import { ImTextWidth } from 'react-icons/im';
 import ThemeContext from '../contexts/ThemeContext';
 import LayoutContext from '../contexts/LayoutContext';
 import { useScroll } from '../hooks/useScroll';
@@ -11,13 +12,18 @@ import {
 } from '../helpers/handlers';
 
 import styles from './Header.module.scss';
+import PreferencesContext from '../contexts/PreferencesContext';
+import classCompactor from '../helpers/classCompator';
 
-const headerVisisble = (currentScroll, scrollingUp) =>
+export const headerVisisble = (currentScroll, scrollingUp) =>
   currentScroll < 80 || scrollingUp;
 
 const Header = () => {
   const { isDark, toggleDark } = useContext(ThemeContext);
   const { toggleProfileOpen, closeProfile } = useContext(LayoutContext);
+  const { toggleWideCodeBlocks, wideCodeBlock } = useContext(
+    PreferencesContext
+  );
   const actOnLightButton = () => {
     toggleDark();
   };
@@ -91,7 +97,18 @@ const Header = () => {
           <a>Zaratan@next</a>
         </Link>
       </h1>
-      <span className={styles.emptyRight} />
+      <span className={styles.rightElems}>
+        <span
+          tabIndex={0}
+          role="button"
+          aria-label="Toggle wide code blocks"
+          className={wideCodeBlock ? styles.rightIconActive : ''}
+          onClick={generateHandleClick(toggleWideCodeBlocks)}
+          onKeyDown={generateHandleKeypress(toggleWideCodeBlocks)}
+        >
+          <ImTextWidth className={styles.rightIcon} />
+        </span>
+      </span>
     </header>
   );
 };

@@ -38,6 +38,15 @@
     }
   }
 
+  pre {
+    margin-bottom: 2rem;
+    margin-top: 0px;
+  }
+
+  :global(.remark-highlight) {
+    margin-top: 0;
+  }
+
   &:global(.wide-code-block) {
     pre {
       position: relative;

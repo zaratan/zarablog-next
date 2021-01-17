@@ -444,14 +444,16 @@ Les composants customs sont simplement des composants React classiques. Je vais 
 - [Youtube](https://github.com/zaratan/zarablog-next/blob/main/components/Youtube.jsx) : Un composant custom qui permet d’afficher des vidéos Youtube à partir de leur ID
 - [FileName](https://github.com/zaratan/zarablog-next/blob/main/components/FileName.tsx) : Un composant qui affiche joliment le nom des fichiers dans les exemples de code tout en étant un lien cliquable lorsque ce sont de vrais fichiers.
 - [FooterArticle](https://github.com/zaratan/zarablog-next/blob/main/components/FooterArticle.tsx) : Un composant qui contient le footer "_standard_" de mes articles.
+- [IdedHeaders](https://github.com/zaratan/zarablog-next/blob/main/components/IdedHeaders.tsx) : Des composants customs pour que les titres aient un petit lien pour un partage rapide d'une section donnée.
 
-<FileName filename="pages/[slug].tsx" line="29-34" blogGithub />
+<FileName filename="pages/[slug].tsx" line="30-39" blogGithub />
 
 ```tsx
 import Image from "next/image";
 import Youtube from "../components/Youtube";
 import FileName from "../components/FileName";
 import FooterArticle from "../components/FooterArticle";
+import { H2, H3, H4, H5 } from "../components/IdedHeaders";
 
 // […]
 
@@ -460,8 +462,14 @@ const components = {
   FileName,
   Image,
   FooterArticle,
+  h2: H2,
+  h3: H3,
+  h4: H4,
+  h5: H5,
 };
 ```
+
+On remarque ici que certains composants ont le nom de tag html classiques. Si c'est le cas, ils remplaceront les tags html classiques qui sont générés par le markdown.
 
 ## MDX flavours
 

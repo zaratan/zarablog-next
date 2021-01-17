@@ -1,7 +1,16 @@
+@import "../styles/theme";
+
 .linkSvg {
   width: 1rem;
 }
 
 .linkA {
   margin-left: 0.3rem;
+  opacity: 0.6;
+  transition: opacity 0.3s ease-in-out;
+  &:hover,
+  &:focus {
+    opacity: 1;
+    color: $blue;
+  }
 }

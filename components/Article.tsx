@@ -3,6 +3,8 @@ import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { fr } from 'date-fns/locale';
 import LayoutContext from '../contexts/LayoutContext';
 import styles from './Article.module.scss';
+import PreferencesContext from '../contexts/PreferencesContext';
+import classCompactor from '../helpers/classCompator';
 
 const Article = ({
   children,
@@ -16,7 +18,9 @@ const Article = ({
   date: Date;
 }) => {
   const { isProfileOpen } = useContext(LayoutContext);
+  const { wideCodeBlock } = useContext(PreferencesContext);
   const profileOpenClass = isProfileOpen ? 'profile-open' : '';
+  const wideCodeBlockClass = wideCodeBlock ? 'wide-code-block' : '';
   return (
     <>
       <header className={styles.articleHeader}>
@@ -35,11 +39,12 @@ const Article = ({
         </section>
       </header>
       <article
-        className={[
+        className={classCompactor([
           styles.articleContainer,
           profileOpenClass,
+          wideCodeBlockClass,
           'line-numbers',
-        ].join(' ')}
+        ])}
       >
         {children}
       </article>

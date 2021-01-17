@@ -9,6 +9,7 @@ import { LayoutProvider } from '../contexts/LayoutContext';
 
 import '../styles/GlobalStyle.scss';
 import '../styles/Code.scss';
+import { PreferencesProvider } from '../contexts/PreferencesContext';
 
 const WrappedApp = ({ Component, pageProps }: AppProps) => {
   const { isDark } = useContext(ThemeContext);
@@ -31,7 +32,9 @@ function MyApp(appProps: AppProps) {
       </Head>
       <ThemeContextProvider>
         <LayoutProvider>
-          <WrappedApp {...appProps} />
+          <PreferencesProvider>
+            <WrappedApp {...appProps} />
+          </PreferencesProvider>
         </LayoutProvider>
       </ThemeContextProvider>
     </>

@@ -1,5 +1,8 @@
 import { setMaxListeners } from 'process';
-import React from 'react';
+import React, { useContext } from 'react';
+import LayoutContext from '../contexts/LayoutContext';
+import PreferencesContext from '../contexts/PreferencesContext';
+import classCompactor from '../helpers/classCompator';
 import styles from './FileName.module.scss';
 
 type FileType = { filename: string; line?: string } & (
@@ -19,6 +22,11 @@ const FileName = ({
   external,
   baseUrl,
 }: FileType) => {
+  const { isProfileOpen } = useContext(LayoutContext);
+  const { wideCodeBlock } = useContext(PreferencesContext);
+  const profileOpenClass = isProfileOpen ? 'profile-open' : '';
+  const wideCodeBlockClass = wideCodeBlock ? 'wide-code-block' : '';
+
   if (blogGithub) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     const [_match, startLine, _endlinePres, endLine] = /(\d+)(-(\d+))?/.exec(
@@ -26,7 +34,11 @@ const FileName = ({
     ) || [null, null, null, null];
     return (
       <a
-        className={styles.fileName}
+        className={classCompactor([
+          styles.fileName,
+          profileOpenClass,
+          wideCodeBlockClass,
+        ])}
         href={`https://github.com/zaratan/zarablog-next/blob/main/${filename}${
           startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
         }`}
@@ -43,7 +55,11 @@ const FileName = ({
     ) || [null, null, null, null];
     return (
       <a
-        className={styles.fileName}
+        className={classCompactor([
+          styles.fileName,
+          profileOpenClass,
+          wideCodeBlockClass,
+        ])}
         href={`${baseUrl}${filename}${
           startLine ? `#L${startLine}${endLine ? `-L${endLine}` : ''}` : ''
         }`}
@@ -54,7 +70,13 @@ const FileName = ({
     );
   }
   return (
-    <span className={styles.fileName}>
+    <span
+      className={classCompactor([
+        styles.fileName,
+        profileOpenClass,
+        wideCodeBlockClass,
+      ])}
+    >
       {filename}
       {line ? `:${line}` : ''}
     </span>

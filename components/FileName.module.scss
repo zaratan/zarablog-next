@@ -19,4 +19,44 @@
   & + div pre {
     border-radius: 0;
   }
+
+  &:global(.wide-code-block) {
+    position: relative;
+    width: 150%;
+    left: -25%;
+
+    &:global(.profile-open) {
+      @media only screen and (max-width: 1600px) {
+        width: 125%;
+        left: -12.5%;
+      }
+
+      @media only screen and (max-width: 1400px) {
+        width: 110%;
+        left: -5%;
+      }
+
+      @media only screen and (max-width: 1300px) {
+        width: 100%;
+        left: 0;
+      }
+    }
+
+    &:not(:global(.profile-open)) {
+      @media only screen and (max-width: 1200px) {
+        width: 125%;
+        left: -12.5%;
+      }
+
+      @media only screen and (max-width: 1000px) {
+        width: 110%;
+        left: -5%;
+      }
+
+      @media only screen and (max-width: 1000px) {
+        width: 100%;
+        left: 0;
+      }
+    }
+  }
 }

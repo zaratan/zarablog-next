@@ -15,8 +15,8 @@ import styles from './Header.module.scss';
 import PreferencesContext from '../contexts/PreferencesContext';
 import classCompactor from '../helpers/classCompator';
 
-export const headerVisisble = (currentScroll, scrollingUp) =>
-  currentScroll < 80 || scrollingUp;
+export const headerVisisble = (atTopScroll, scrollingUp) =>
+  atTopScroll || scrollingUp;
 
 const Header = () => {
   const { isDark, toggleDark } = useContext(ThemeContext);
@@ -37,13 +37,13 @@ const Header = () => {
     closeProfile();
   };
 
-  const { currentScroll, scrollingUp } = useScroll();
+  const { scrollingUp, atTopScroll } = useScroll();
 
   return (
     <header
       className={[
         styles.headerStyle,
-        headerVisisble(currentScroll, scrollingUp) ? 'visible' : '',
+        headerVisisble(atTopScroll, scrollingUp) ? 'visible' : '',
       ].join(' ')}
     >
       <nav className={styles.circleContainer}>
@@ -56,8 +56,10 @@ const Header = () => {
             role="button"
             tabIndex={0}
           >
-            <span className={[styles.circle, styles.red].join(' ')}>
-              <FaHome className={[styles.icon, 'svg-inline--fa'].join(' ')} />
+            <span className={classCompactor([styles.circle, styles.red])}>
+              <FaHome
+                className={classCompactor([styles.icon, 'svg-inline--fa'])}
+              />
             </span>
           </a>
         </Link>
@@ -71,9 +73,13 @@ const Header = () => {
         >
           <span className={[styles.circle, styles.yellow].join(' ')}>
             {isDark ? (
-              <FaSun className={[styles.icon, 'svg-inline--fa'].join(' ')} />
+              <FaSun
+                className={classCompactor([styles.icon, 'svg-inline--fa'])}
+              />
             ) : (
-              <FaMoon className={[styles.icon, 'svg-inline--fa'].join(' ')} />
+              <FaMoon
+                className={classCompactor([styles.icon, 'svg-inline--fa'])}
+              />
             )}
           </span>
         </span>
@@ -85,9 +91,13 @@ const Header = () => {
           onClick={generateHandleClick(actOnProfileButton)}
           onKeyDown={generateHandleKeypress(actOnProfileButton)}
         >
-          <span className={[styles.circle, styles.green].join(' ')}>
+          <span className={classCompactor([styles.circle, styles.green])}>
             <FaUser
-              className={[styles.icon, 'svg-inline--fa', 'fa-w-14'].join(' ')}
+              className={classCompactor([
+                styles.icon,
+                'svg-inline--fa',
+                'fa-w-14',
+              ])}
             />
           </span>
         </span>

@@ -19,13 +19,13 @@
   font-family: Inconsolata;
   position: fixed;
   overflow-y: scroll;
-  transition: top 0.3s ease-in-out;
-  top: 0px;
+  transition: padding-top 0.3s ease-in-out;
+  padding-top: 0px;
 }
 
 .headerVisible {
-  top: 20px;
+  padding-top: 20px;
   @media only screen and (max-width: 500px) {
-    top: 30px;
+    padding-top: 30px;
   }
 }

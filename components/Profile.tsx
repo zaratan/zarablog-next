@@ -5,10 +5,6 @@ import Image from 'next/image';
 import { ImTextWidth } from 'react-icons/im';
 import styles from './Profile.module.scss';
 import PreferencesContext from '../contexts/PreferencesContext';
-import {
-  generateHandleClick,
-  generateHandleKeypress,
-} from '../helpers/handlers';
 import Slider from './Slider';
 import { useScroll } from '../hooks/useScroll';
 import classCompactor from '../helpers/classCompator';
@@ -24,13 +20,13 @@ const Profile = () => {
   const { wideCodeBlock, toggleWideCodeBlocks } = useContext(
     PreferencesContext
   );
-  const { currentScroll, scrollingUp } = useScroll();
+  const { atTopScroll, scrollingUp } = useScroll();
 
   return (
     <div
       className={classCompactor([
         styles.profileContainer,
-        headerVisisble(currentScroll, scrollingUp) ? styles.headerVisible : '',
+        headerVisisble(atTopScroll, scrollingUp) ? styles.headerVisible : '',
       ])}
     >
       <ImgProfilePic />

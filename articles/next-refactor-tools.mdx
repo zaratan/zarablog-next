@@ -1,0 +1,502 @@
+---
+title: "Javascript : Outils de dev"
+date: 2021-02-22T16:02:13+09:00
+categories:
+  - front
+  - tools
+  - code
+description: "Un tour des différents outils que j’utilise pour gérer mon développement en Javascript"
+---
+
+Dans un [précédent article](./create-a-new-gem) je vous ai exposé l’ensemble des outils que j’utilise pour automatiser le déploiement d’une gem. Aujourd’hui, je vais vous présenter ma stack pour un projet NextJS ou tout autre projet à base de JS.
+
+## Attentes lors du développement
+
+En tant que développeur les points les plus importants sont :
+
+- La vitesse à laquelle j’ai du feedback : Si je dois attendre 2 secs à chaque fois que je sauve un fichier pour savoir si ce que j’ai fait est correct ça va me sortir de mon flow de pensées le temps que j’ai le retour. La productivité sera vraiment réduite.
+- Détecter les erreurs au plus tôt : Il faut que les outils soient disponibles de façon quasi automatique pendant le développement et pas quand je déciderai de commit et que je me rends compte des centaines d’erreurs.
+- Ne pas se mettre en travers de mon chemin : Si un outil bloque mon flow de pensée pour me forcer à fixer des erreurs de syntaxe, cet outil va juste me ralentir.
+- Gérer pour moi une partie de la complexité : Si l’outil me permet d’oublier une partie des choses et celui-ci me rappellera que je suis un “_idiot_” en me proposant la solution c’est parfait.
+
+On va voir qu’on a rarement tout en même temps et qu’en général on doit composer avec certains défauts, car ils sont écrasés par les bénéfices de l’outil.
+
+### TypeScript
+
+Pour ceux qui ne le savent pas, qu’est-ce que TypeScript : C’est un langage développé par Microsoft qui sera transformé en JS. Il ajoute la notion de “type” aux déclarations de constantes et de fonctions et vérifie que ce type est respecté/consistant au travers de notre application. De nombreux IDEs ont une très bonne intégration avec TypeScript en s’en servant pour faire de l’autocompletion et afficher de la documentation.
+
+Voilà un exemple succinct de TS (un article ne parlant que de ça verra surement le jour dans les prochaines semaines/mois).
+
+```ts
+type Item = {
+  key: string;
+  properties: Array<{ name: string; value: string | number }>;
+};
+
+const item: Item = {
+  key: "table",
+  properties: [{ name: "legs", value: 4 }],
+};
+
+const countLegs = (items: Array<Item>) =>
+  items.reduce<number>(
+    (res, item) =>
+      res + (item.properties.find((e) => e.name === "legs")?.value || 0)
+  );
+```
+
+Venant de Ruby, mettre à nouveau un type à mes objets fut très étrange. Après m’être fait brûler “_quelques_” fois par les “particularités” de JS ou des librairies associées, je trouve que TypeScript me sauve plus de temps qu’il ne m’en coute.
+
+Cet outil n’est clairement pas sans défauts 😶 Et on va en lister ici quelques-uns.
+
+- Les erreurs : Lire une erreur TS est à peu près aussi utile que lire un roman dans une langue étrangère inconnue et qu’on ne veut pas apprendre. Elles sont obscures et n’aident pas du tout à leur résolution. Bien heureusement, on apprend petit à petit à ne plus tomber dans les pièges qui les font sortir du bois. Ici, TS se met en travers du chemin.
+- Typer les choses prends du temps : ajouter des déclarations de type partout, prendre le temps de [comprendre](https://www.typescriptlang.org/docs/handbook/utility-types.html) [comment](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) [marche](https://www.typescriptlang.org/docs/handbook/advanced-types.html) le typage et réfléchir en amont à la forme des objets qui seront utilisés, va clairement ralentir la cadence.
+- Typer les choses est moins flexible et parfois difficile (notamment quand on veut créer des fonctions un peu génériques qui acceptent plusieurs types)
+
+La force de cet outil se trouve dans ce genre de cas :
+
+```ts
+// <input type="text" onchange="onChange">
+const onChange = (event) => {
+  event.current.target;
+  event.target;
+};
+```
+
+Seriez-vous capable de me donner la liste des fonctions présentes sur `event.target` et `event.current.target` et être sûr que vous les utilisez avec le bon type d’arguments ? Moi… non. TS, oui.
+
+Ou encore, cas que j'ai eu tout récemment, un besoin d'utiliser les APIs de chrome pour les extensions.
+
+<Image
+  src="/articles/next-refactor-tools/typescript_chrome_autocomplete.png"
+  height="552"
+  width="1702"
+  alt="Chrome extension API autocomplete"
+/>
+
+Typescript, même s’il est parfois dans mon chemin, me libère énormément d’espace mental quant au format des choses que je vais recevoir et comment les utiliser. De plus il me trouve des erreurs avant même qu’elles n’arrivent… Dans le navigateur des clients.
+
+##### Activer TS dans un projet NextJS
+
+Pour ceux qui cherchent la façon de l’activer et l’utiliser dans NextJS il suffit de faire, à la racine de votre projet : `touch tsconfig.json` et de relancer votre serveur de dev. Votre projet acceptera maintenant les fichiers `.ts` et `.tsx`.
+
+Pour un peu plus d’informations, je vous renvoie vers [la page de documentation correspondante](https://nextjs.org/docs/basic-features/typescript)
+
+Maintenant qu’on a un outil qui détecte une partie des erreurs et gère la documentation du code. On va régler les problématiques de style.
+
+### Prettier
+
+[Prettier](https://prettier.io), est un outil qui permet de formater le code de manière automatique. Les principales différences avec [Rubocop](http://rubocop.org/) ou [Eslint](#eslint) sont les suivantes :
+
+- Prettier utilise un [AST](https://prettier.io/docs/en/index.html) pour reformater le code. Plutôt qu’un outil qui ne comprend pas vraiment la logique d’une ligne de code, prettier va décomposer vos lignes de code sous la forme d’un arbre et s’en servir pour rendre un code qui suit ses différentes règles. Prettier a donc beaucoup plus de facilités à traiter des lignes complexes ou forcer des sauts de ligne aux bons endroits.
+- Prettier n’a presque pas d’options de configuration. L’idée est de couper les “_nombreuses_” discussions inutiles qui apparaissent lorsqu’on décide de la façon dont on va formater notre code. Comme beaucoup de projets se sont mis à utiliser Prettier, à travers l’écosystème javascript, beaucoup de projets ont une allure très similaire maintenant.
+- Prettier n’a pas de règles quant à la qualité de code. Prettier n’a aucun problème à ce que votre code ait des variables inutilisées ou des problèmes de performance/sécurité.
+
+##### Comment ajouter Prettier à un projet ?
+
+On commence par ajouter prettier à nos outils de développement.
+
+```bash
+ yarn add -D prettier
+```
+
+On est maintenant capable de lancer la commande
+
+```bash
+yarn prettier --writte mon/path/vers/mon/fichier.ts
+```
+
+Voilà. Je ne vais pas parler de l’intégration entre prettier et un éditeur, car on va voir qu’on utilisera quasiment jamais prettier seul. On va utiliser un autre outil pour le lancer. Cet outil sera aussi responsable de gérer les règles de qualité de code.
+
+### ESlint : One tool to run them all
+
+ESlint est à Javascript ce que Rubocop est à ruby. C’est un linter, très configurable qui prend en charge un grand éventail de règles et de plugins.
+
+La configuration minimale d'ESlint ressemble à :
+
+<FileName filename=".eslintrc.js" />
+
+```js
+module.exports = {
+  root: true,
+  extends: [],
+  env: {
+    browser: true,
+  },
+  rules: {},
+  plugins: [],
+  ignorePatterns: [],
+};
+```
+
+On va construire "ensemble" cette configuration.
+
+##### Style d’Airbnb + React
+
+Tout d'abord j'aime partir d'un style guide pré-fait et qui est sensible. J'aime bien utiliser le [style-guide d'Airbnb](https://airbnb.io/javascript/) avec qui je suis assez souvent d'accord. Intégrer chaque règle à la main dans ESlint serait bien complexe. On peut donc partir de leur extension : Pour [React](https://www.npmjs.com/package/eslint-config-airbnb) et pour [Non-React](https://www.npmjs.com/package/eslint-config-airbnb-base).
+
+On va passer au travers de la configuration pour un projet React (et donc next).
+
+Tout d'abord, l'ajouter a notre projet:
+
+```bash
+npx install-peerdeps --dev eslint-config-airbnb
+```
+
+Ce "script" va détecter si on utilise `npm` ou `yarn` et installer avec les différentes dépendances (dont `eslint`).
+
+À l'heure de l'écriture de cet article, cette commande va ajouter à notre package.json :
+
+<FileName filename="package.json" />
+
+```js
+"eslint": "^7.2.0",
+"eslint-config-airbnb": "18.2.1",
+"eslint-plugin-import": "^2.22.1",
+"eslint-plugin-jsx-a11y": "^6.4.1",
+"eslint-plugin-react": "^7.21.5",
+"eslint-plugin-react-hooks": "^1.7.0"
+```
+
+On peut ensuite l'ajouter à notre configuration
+
+```js
+module.exports = {
+  root: true,
+  extends: ["airbnb"],
+  env: {
+    browser: true,
+  },
+  rules: {},
+  plugins: ["react-hooks"],
+  ignorePatterns: [],
+};
+```
+
+##### Intégration avec Prettier
+
+Avoir deux outils différents qui régissent notre syntaxe et sont parfois en contraction est "_peu_" optimal. Il y a plusieurs méthodes pour faire ça, mais on va se concentrer sur celle qui marche le mieux :
+
+On va faire en sorte que ESlint soit responsable de lancer Prettier et respecte les décisions de ce dernier.
+
+On commence par installer les plugins Prettier pour ESlint :
+
+```bash
+yarn add -D eslint-config-prettier eslint-plugin-prettier
+```
+
+On modifie ensuite notre configuration pour les utiliser :
+
+```js
+module.exports = {
+  root: true,
+  extends: ["airbnb", "prettier", "plugin:prettier/recommended"],
+  env: {
+    browser: true,
+  },
+  rules: {
+    // On configure prettier
+    "prettier/prettier": [
+      "error",
+      {
+        trailingComma: "es5",
+        singleQuote: true,
+        printWidth: 80,
+        semi: true,
+      },
+    ],
+  },
+  plugins: ["prettier", "react-hooks"],
+  ignorePatterns: [],
+};
+```
+
+Voilà.
+
+##### Intégration avec Typescript
+
+En fait, on avait un troisième outil responsable de vérifier notre code : TypeScript. Pour l'instant ESlint est configuré pour fonctionner avec des fichiers Javascript normaux. On va donc faire en sorte qu'il soit compatible avec TypeScript :
+
+```bash
+yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
+```
+
+On l'ajoute à notre configuration :
+
+```js
+module.exports = {
+  root: true,
+  parser: "@typescript-eslint/parser",
+  extends: [
+    "airbnb",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+  ],
+  env: {
+    browser: true,
+  },
+  rules: {
+    // On configure prettier
+    "prettier/prettier": [
+      "error",
+      {
+        trailingComma: "es5",
+        singleQuote: true,
+        printWidth: 80,
+        semi: true,
+      },
+    ],
+  },
+  plugins: ["prettier", "react-hooks", "@typescript-eslint"],
+  ignorePatterns: ["next-env.d.ts"],
+};
+```
+
+On a donc maintenant ESlint responsable de lancer et vérifier notre code avec nos trois outils.
+
+##### Configuration finale et commentaires
+
+Voilà ma configuration pour eslint que j’utilise pour tous mes projets React/Next :
+
+J'ai pas mal de règles custom qui viennent de nombreuses itérations. Certaines ne sont peut-être plus "si" utiles, mais je vous la laisse telle quelle :
+
+<FileName blogGithub filename=".eslintrc.js" />
+
+```js
+module.exports = {
+  root: true,
+  parser: "@typescript-eslint/parser",
+  extends: [
+    "airbnb",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+  ],
+  env: {
+    browser: true,
+    node: true,
+    jquery: true,
+    jest: true,
+  },
+  rules: {
+    // const > let >>>> var
+    // On va aussi destructurer les object autant que possible
+    "prefer-const": [
+      "error",
+      {
+        destructuring: "all",
+      },
+    ],
+    // Les arrow functions auront des {} seulement si nécessaire.
+    "arrow-body-style": [2, "as-needed"],
+    // Detecte les cas ou des lignes sont inutilisées
+    // Le allowTaggedTemplates est là pour de la compatibilité avec
+    // styled-components
+    "no-unused-expressions": [
+      2,
+      {
+        allowTaggedTemplates: true,
+      },
+    ],
+    "no-param-reassign": [
+      2,
+      {
+        props: false,
+      },
+    ],
+    // On autorise les console.log car je l'utilise trop souvent en debug
+    // pour accepter que JS me crie dessus.
+    "no-console": 0,
+    // Il y a des cas où on veut juste un named export dans un fichier
+    // nottament en cours de dev. Je ne suis pas sûr qu'il y ait un réel
+    // intérêt à cette règle qui vient de AirBnb.
+    "import/prefer-default-export": 0,
+    import: 0,
+    // Il y a des cas où on va vouloir des fonctions anonymes en JS
+    "func-names": 0,
+    // J'aime bien ne pas avoir d'espace avant les () dans une déclaration
+    "space-before-function-paren": 0,
+    // C'est le taf de prettier
+    "comma-dangle": 0,
+    "max-len": 0,
+    "import/extensions": 0,
+    "no-underscore-dangle": 0,
+    // Il y a des cas tout à fait valide de renvoyer soit null soit
+    // un objet dans une fonction. C'est le travail de TS de trouver
+    // ces erreurs.
+    "consistent-return": 0,
+    // Chaque composant doit avoir un nom. C'est affreux a debug sinon.
+    "react/display-name": 1,
+    "react/no-array-index-key": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/prefer-stateless-function": 0,
+    "react/forbid-prop-types": 0,
+    "react/no-unescaped-entities": 0,
+    // Emoji everywhere
+    "jsx-a11y/accessible-emoji": 0,
+    "react/require-default-props": 0,
+    // On liste les extensions de fichiers qui peuvent contenir du JSX
+    "react/jsx-filename-extension": [
+      1,
+      {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      },
+    ],
+    radix: 0,
+    // Ça sera géré par Prettier
+    quotes: [
+      2,
+      "single",
+      {
+        avoidEscape: true,
+        allowTemplateLiterals: true,
+      },
+    ],
+    // On configure prettier
+    "prettier/prettier": [
+      "error",
+      {
+        trailingComma: "es5",
+        singleQuote: true,
+        printWidth: 80,
+        semi: true,
+      },
+    ],
+    // Des fois c'est pratique d'avoir des liens avec
+    // '#' ou des valeurs invalides comme href
+    // lors du prototypage.
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": [
+      "warn",
+      {
+        aspects: ["invalidHref"],
+      },
+    ],
+    // Marquer le non-repect des règles de hook comme des erreurs.
+    "react-hooks/rules-of-hooks": "error",
+    // Marquer le fait qu'il manque des dépendances dans les useEffect
+    // comme un warning.
+    "react-hooks/exhaustive-deps": "warn",
+    // Les 2 règles suivantes sont là pour autoriser
+    // à ce que les fonctions et modules ne soient pas typés.
+    // En effet, dans un contexte React, la plupart du temps nos
+    // fonctions seront des composants et leur typage sera inutile.
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+
+    // Les règles suivantes sont présente pour un défaut de
+    // compatibilité entre ESlint et Typescript.
+    // On desactive les règles de ESLint et
+    // on active les règles de typescript-eslint correspondantes.
+
+    // La plupart du temps on veut que eslint hurle quand des variables
+    // ne sont pas utilisées. On autorise certains patterns classiques.
+    // notamment les variables commençant par _
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      1,
+      {
+        argsIgnorePattern: "res|next|Sequelize|^err|^_.*",
+      },
+    ],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"],
+  },
+  // Les différents plugins
+  plugins: ["prettier", "react-hooks", "@typescript-eslint"],
+  // Ces fichiers ne sont pas écrits par nous.
+  ignorePatterns: ["next-env.d.ts", "node_modules/", "/public/"],
+};
+```
+
+Cette configuration s'intègre très bien avec VSCode et son extension [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+
+### Husky + lint-staged
+
+On va maintenant faire en sorte que ces règles et outils soient "forcés" lors d'un commit ou un push.
+
+Pour ça on utilise deux outils séparés :
+
+- [Husky](Note%20pour%20plus%20tard%20:%20Je%20sais%20jamais%20comment%20interpr%C3%A9ter%20ce%20genre%20de%20messages), qui va gérer pour nous les git hooks.
+- [Lint-staged](https://github.com/okonet/lint-staged), qui ne va lancer des commandes que sur certains fichiers.
+
+L'installation et configuration est assez simple :
+
+On installe les librairies :
+
+```bash
+yarn add -D husky lint-staged
+```
+
+On ajoute quelques scripts dans `package.json`
+
+```json
+{
+  …
+  "scripts": {
+    …
+    // Ajoute une commande `yarn lint` pour lancer eslint
+    "lint": "eslint .",
+    // Assure que les hooks de husky sont intallés automatiquement
+    "postinstall": "husky install"
+  }
+  …
+}
+```
+
+On ajoute ensuite la configuration pour lint-staged au `package.json`
+
+```json
+{
+  …
+  "lint-staged": {
+    // Tous les fichiers js(x) et ts(x) qui vont être commit seront check.
+    "*.js": "eslint --cache --fix",
+    "*.jsx": "eslint --cache --fix",
+    "*.ts": "eslint --cache --fix",
+    "*.tsx": "eslint --cache --fix"
+  }
+}
+```
+
+Ensuite on configure les différents husky hooks :
+
+Au commit on lance lint-staged
+
+<FileName filename=".husky/pre-commit" blogGithub />
+
+```bash
+/sh
+. "$(dirname "$0")/_/husky.sh"
+
+yarn lint-staged
+```
+
+Au push on vérifie tous nos fichiers.
+
+<FileName filename=".husky/pre-push" blogGithub />
+
+```bash
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+yarn lint
+```
+
+## Conclusion
+
+Voilà un article assez simple qui donne la configuration des quelques outils que j'utilise pour mes projets Javascript. Vous devriez pouvoir l'utiliser quasiment telle quelle.
+
+De plus, j'espère que ça vous aura donné une idée de ce que j'utilise pour choisir d'intégrer (ou non) un nouvel outil dans ma stack.
+
+<FooterArticle
+  prId={11}
+  helpers={[{ name: "@Showner", link: "https://twitter.com/showner_dev" }]}
+/>

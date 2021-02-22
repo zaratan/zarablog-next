@@ -1,6 +1,6 @@
 ---
 title: "Javascript : Outils de dev"
-date: 2020-11-22T04:33:13+09:00
+date: 2021-02-22T16:02:13+09:00
 categories:
   - front
   - tools
@@ -13,10 +13,11 @@ Dans un [précédent article](./create-a-new-gem) je vous ai exposé l’ensembl
 ## Attentes lors du développement
 
 En tant que développeur les point les plus importants sont :
-- La vitesse à laquelle j’ai du feedback : Si je dois attendre 2 secs à chaque fois que je sauve un fichier pour savoir si ce que j’ai fait est correct ça va me sortir de mon flow de pensées le temps que j’ai le retour. La productivité sera vraiment réduite. 
+
+- La vitesse à laquelle j’ai du feedback : Si je dois attendre 2 secs à chaque fois que je sauve un fichier pour savoir si ce que j’ai fait est correct ça va me sortir de mon flow de pensées le temps que j’ai le retour. La productivité sera vraiment réduite.
 - Détecter les erreurs au plus tôt : Il faut que les outils soient disponibles de façon quasi automatique pendant le développement et pas quand je déciderai de commit et que je me rends compte des centaines d’erreurs.
 - Ne pas se mettre en travers de mon chemin : Si un outil bloque mon flow de pensée pour me forcer à fixer des erreurs de syntaxe, cet outil va juste me ralentir.
-- Gérer pour moi une partie de la complexité : Si l’outil me permet d’oublier une partie des choses et celui-ci me rappellera que je suis un “_idiot_” en me proposant la solution c’est parfait. 
+- Gérer pour moi une partie de la complexité : Si l’outil me permet d’oublier une partie des choses et celui-ci me rappellera que je suis un “_idiot_” en me proposant la solution c’est parfait.
 
 On va voir qu’on a rarement tout en même temps et qu’en général on doit composer avec certains défauts, car ils sont écrasés par les bénéfices de l’outil.
 
@@ -29,44 +30,49 @@ Voilà un exemple succinct de TS (un article ne parlant que de ça verra suremen
 ```ts
 type Item = {
   key: string;
-  properties: Array<{name: string; value: string | number}>
+  properties: Array<{ name: string; value: string | number }>;
 };
 
 const item: Item = {
-    key: 'table',
-    properties: [
-      { name: 'legs', value: 4 }
-    ]
+  key: "table",
+  properties: [{ name: "legs", value: 4 }],
 };
 
-const countLegs = (items: Array<Item>) => (
-  items.reduce<number>((res, item) => (
-    res + (item.properties.find(e => e.name === 'legs')?.value || 0)
-  ))
-)
+const countLegs = (items: Array<Item>) =>
+  items.reduce<number>(
+    (res, item) =>
+      res + (item.properties.find((e) => e.name === "legs")?.value || 0)
+  );
 ```
 
 Venant de Ruby, mettre à nouveau un type à mes objets fut très étrange. Après m’être fait brûler “_quelques_” fois par les “particularités” de JS ou des librairies associées, je trouve que TypeScript me sauve plus de temps qu’il ne m’en coute.
 
 Cet outil n’est clairement pas sans défauts 😶 Et on va en lister ici quelques-uns.
+
 - Les erreurs : Lire une erreur TS est à peu près aussi utile que lire un roman dans une langue étrangère inconnue et qu’on ne veut pas apprendre. Elles sont obscures et n’aident pas du tout à leur résolution. Bien heureusement, on apprend petit à petit à ne plus tomber dans les pièges qui les font sortir du bois. Ici, TS se met en travers du chemin.
 - Typer les choses prends du temps : ajouter des déclarations de type partout, prendre le temps de [comprendre](https://www.typescriptlang.org/docs/handbook/utility-types.html) [comment](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) [marche](https://www.typescriptlang.org/docs/handbook/advanced-types.html) le typage et réfléchir en amont à la forme des objets qui seront utilisés, va clairement ralentir la cadence.
 - Typer les choses est moins flexible et parfois difficile (notamment quand on veut créer des fonctions un peu génériques qui acceptent plusieurs types)
 
 La force de cet outil se trouve dans ce genre de cas :
+
 ```ts
 // <input type="text" onchange="onChange">
 const onChange = (event) => {
-  event.current.target
-  event.target
-}
+  event.current.target;
+  event.target;
+};
 ```
 
-Seriez-vous capable de me donner la liste des méthodes présentes sur `event.target` et `event.current.target` et être sûr que vous les utilisez avec le bon type d’arguments ? Moi… non. TS, oui. 
+Seriez-vous capable de me donner la liste des méthodes présentes sur `event.target` et `event.current.target` et être sûr que vous les utilisez avec le bon type d’arguments ? Moi… non. TS, oui.
 
 Ou encore, cas que j'ai eu tout récemment, un besoin d'utiliser les APIs de chrome pour les extensions.
 
-<Image src="" height="552" width="1702" alt="Chrome extension API autocomplete" />
+<Image
+  src="/articles/next-refactor-tools/typescript_chrome_autocomplete.png"
+  height="552"
+  width="1702"
+  alt="Chrome extension API autocomplete"
+/>
 
 Typescript, même s’il est parfois dans mon chemin, me libère énormément d’espace mental quant au format des choses que je vais recevoir et comment les utiliser. De plus il me trouve des erreurs avant même qu’elles n’arrivent… Dans le navigateur des clients.
 
@@ -85,7 +91,7 @@ Maintenant qu’on a un outil qui détecte une partie des erreurs et gère la do
 - Prettier utilise un [AST](https://prettier.io/docs/en/index.html) pour reformater le code. Plutôt qu’un outil qui ne comprend pas vraiment la logique d’une ligne de code, prettier va décomposer vos lignes de code sous la forme d’un arbre et s’en servir pour rendre un code qui suit ses différentes règles. Prettier a donc beaucoup plus de facilités à traiter des lignes complexes ou forcer des sauts de ligne aux bons endroits.
 - Prettier n’a presque pas d’options de configuration. L’idée est de couper les “_nombreuses_” discussions inutiles qui apparaissent lorsqu’on décide de la façon dont on va formater notre code. Comme beaucoup de projets se sont mis à utiliser Prettier, à travers l’écosystème javascript, beaucoup de projets ont une allure très similaire maintenant.
 - Prettier n’a pas de règles quant à la qualité de code. Prettier n’a aucun problème à ce que votre code ait des variables inutilisées ou encore des règles de performance/sécurité.
-	 
+
 ##### Comment ajouter Prettier à un projet ?
 
 On commence par ajouter prettier à nos outils de développement.
@@ -132,13 +138,14 @@ Tout d'abord j'aime partir d'un style guide pré-fait et qui est sensible. J'aim
 On va passer au travers de la configuration pour un projet React (et donc next).
 
 Tout d'abord, l'ajouter a notre projet:
+
 ```bash
 npx install-peerdeps --dev eslint-config-airbnb
 ```
 
 Ce "script" va détecter si on utilise `npm` ou `yarn` et installer avec les différentes dépendances (dont `eslint`).
 
- À l'heure de l'écriture de cet article, cette commande va ajouter à notre package.json :
+À l'heure de l'écriture de cet article, cette commande va ajouter à notre package.json :
 
 \<FileName filename="package.json" /\>
 
@@ -156,20 +163,18 @@ On peut ensuite l'ajouter à notre configuration
 ```js
 module.exports = {
   root: true,
-  extends: [
-    "airbnb"
-  ],
+  extends: ["airbnb"],
   env: {
     browser: true,
   },
-  rules: {
-  },
-  plugins: ['react-hooks'],
+  rules: {},
+  plugins: ["react-hooks"],
   ignorePatterns: [],
 };
 ```
 
 ##### Intégration avec Prettier
+
 Avoir deux outils différents qui régissent notre syntaxe et sont parfois en contraction est "_peu_" optimal. Il y a plusieurs méthodes pour faire ça, mais on va se concentrer sur celle qui marche le mieux :
 
 On va faire en sorte que ESlint soit responsable de lancer Prettier et respecte les décisions de ce dernier.
@@ -185,34 +190,31 @@ On modifie ensuite notre configuration pour les utiliser :
 ```js
 module.exports = {
   root: true,
-  extends: [
-    "airbnb",
-    'prettier',
-    'plugin:prettier/recommended',
-  ],
+  extends: ["airbnb", "prettier", "plugin:prettier/recommended"],
   env: {
     browser: true,
   },
   rules: {
     // On configure prettier
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
-        trailingComma: 'es5',
+        trailingComma: "es5",
         singleQuote: true,
         printWidth: 80,
         semi: true,
       },
     ],
   },
-  plugins: ['prettier','react-hooks'],
+  plugins: ["prettier", "react-hooks"],
   ignorePatterns: [],
 };
 ```
 
 Voilà.
- 
+
 ##### Intégration avec Typescript
+
 En fait, on avait un troisième outil responsable de vérifier notre code : TypeScript. Pour l'instant ESlint est configuré pour fonctionner avec des fichiers Javascript normaux. On va donc faire en sorte qu'il soit compatible avec TypeScript :
 
 ```bash
@@ -224,32 +226,32 @@ On l'ajoute à notre configuration :
 ```js
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   extends: [
     "airbnb",
-    'prettier',
-    'plugin:prettier/recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/typescript',
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
   ],
   env: {
     browser: true,
   },
   rules: {
     // On configure prettier
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
-        trailingComma: 'es5',
+        trailingComma: "es5",
         singleQuote: true,
         printWidth: 80,
         semi: true,
       },
     ],
   },
-  plugins: ['prettier','react-hooks', '@typescript-eslint'],
-  ignorePatterns: ['next-env.d.ts'],
+  plugins: ["prettier", "react-hooks", "@typescript-eslint"],
+  ignorePatterns: ["next-env.d.ts"],
 };
 ```
 
@@ -266,14 +268,14 @@ J'ai pas mal de règles custom qui viennent de nombreuses itérations. Certaines
 ```js
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   extends: [
-    'airbnb',
-    'prettier',
-    'plugin:prettier/recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/typescript',
+    "airbnb",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
   ],
   env: {
     browser: true,
@@ -284,24 +286,24 @@ module.exports = {
   rules: {
     // const > let >>>> var
     // On va aussi destructurer les object autant que possible
-    'prefer-const': [
-      'error',
+    "prefer-const": [
+      "error",
       {
-        destructuring: 'all',
+        destructuring: "all",
       },
     ],
     // Les arrow function auront des {} seulement si nécessaire.
-    'arrow-body-style': [2, 'as-needed'],
+    "arrow-body-style": [2, "as-needed"],
     // Detecte les cas ou des lignes sont inutilisées
     // Le allowTaggedTemplates est là pour de la compatibilité avec
     // styled-components
-    'no-unused-expressions': [
+    "no-unused-expressions": [
       2,
       {
         allowTaggedTemplates: true,
       },
     ],
-    'no-param-reassign': [
+    "no-param-reassign": [
       2,
       {
         props: false,
@@ -309,108 +311,108 @@ module.exports = {
     ],
     // On autorise les console.log car je l'utilise trop souvent en debug
     // pour accepter que JS me crie dessus.
-    'no-console': 0,
+    "no-console": 0,
     // Il y a des cas où on veut juste un named export dans un fichier
     // nottament en cours de dev. Je ne suis pas sûr qu'il y ait un réel
-    // intérêt à cette règle qui vient de AirBnb. 
-    'import/prefer-default-export': 0,
+    // intérêt à cette règle qui vient de AirBnb.
+    "import/prefer-default-export": 0,
     import: 0,
     // Il y a des cas où on va vouloir des fonctions anonymes en JS
-    'func-names': 0,
+    "func-names": 0,
     // J'aime bien ne pas avoir d'espace avant les () dans une déclaration
-    'space-before-function-paren': 0,
+    "space-before-function-paren": 0,
     // C'est le taf de prettier
-    'comma-dangle': 0,
-    'max-len': 0,
-    'import/extensions': 0,
-    'no-underscore-dangle': 0,
+    "comma-dangle": 0,
+    "max-len": 0,
+    "import/extensions": 0,
+    "no-underscore-dangle": 0,
     // Il y a des cas tout à fait valide de renvoyer soit null soit
     // un objet dans une fonction. C'est le travail de TS de trouver
     // ces erreurs.
-    'consistent-return': 0,
+    "consistent-return": 0,
     // Chaque composant doit avoir un nom. C'est affreux a debug sinon.
-    'react/display-name': 1,
-    'react/no-array-index-key': 0,
-    'react/react-in-jsx-scope': 0,
-    'react/prefer-stateless-function': 0,
-    'react/forbid-prop-types': 0,
-    'react/no-unescaped-entities': 0,
+    "react/display-name": 1,
+    "react/no-array-index-key": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/prefer-stateless-function": 0,
+    "react/forbid-prop-types": 0,
+    "react/no-unescaped-entities": 0,
     // Emoji everywhere
-    'jsx-a11y/accessible-emoji': 0,
-    'react/require-default-props': 0,
+    "jsx-a11y/accessible-emoji": 0,
+    "react/require-default-props": 0,
     // On liste les extensions de fichiers qui peuvent contenir du JSX
-    'react/jsx-filename-extension': [
+    "react/jsx-filename-extension": [
       1,
       {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
     ],
     radix: 0,
     // Ça sera géré par Prettier
     quotes: [
       2,
-      'single',
+      "single",
       {
         avoidEscape: true,
         allowTemplateLiterals: true,
       },
     ],
     // On configure prettier
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
-        trailingComma: 'es5',
+        trailingComma: "es5",
         singleQuote: true,
         printWidth: 80,
         semi: true,
       },
     ],
-    // Des fois c'est pratique d'avoir des liens avec 
+    // Des fois c'est pratique d'avoir des liens avec
     // '#' ou des valeurs invalides comme href
     // lors du prototypage.
-    'jsx-a11y/href-no-hash': 'off',
-    'jsx-a11y/anchor-is-valid': [
-      'warn',
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": [
+      "warn",
       {
-        aspects: ['invalidHref'],
+        aspects: ["invalidHref"],
       },
     ],
     // Marquer le non-repect des règles de hook comme des erreurs.
-    'react-hooks/rules-of-hooks': 'error',
+    "react-hooks/rules-of-hooks": "error",
     // Marquer le fait qu'il manque des dépendances dans les useEffect
     // comme un warning.
-    'react-hooks/exhaustive-deps': 'warn',
+    "react-hooks/exhaustive-deps": "warn",
     // Les 2 règles suivantes sont là pour autoriser
     // à ce que les fonctions et modules ne soient pas typés.
     // En effet, dans un contexte React, la plupart du temps nos
-    // fonctions seront des composants et leur typage sera inutile. 
-    '@typescript-eslint/explicit-function-return-type': 0,
-    '@typescript-eslint/explicit-module-boundary-types': 0,
-    
+    // fonctions seront des composants et leur typage sera inutile.
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+
     // Les règles suivantes sont présente pour un défaut de
-    // compatibilité entre ESlint et Typescript. 
-    // On desactive les règles de ESLint et 
+    // compatibilité entre ESlint et Typescript.
+    // On desactive les règles de ESLint et
     // on active les règles de typescript-eslint correspondantes.
 
-    // La plupart du temps on veut que eslint hurle quand des variables 
+    // La plupart du temps on veut que eslint hurle quand des variables
     // ne sont pas utilisées. On autorise certains patterns classiques.
     // notemment les variables commençant par _
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': [
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
       1,
       {
-        argsIgnorePattern: 'res|next|Sequelize|^err|^_.*',
+        argsIgnorePattern: "res|next|Sequelize|^err|^_.*",
       },
-    ], 
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error'],
-    'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': ['error'],
+    ],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"],
   },
   // Les différents plugins
-  plugins: ['prettier', 'react-hooks', '@typescript-eslint'],
+  plugins: ["prettier", "react-hooks", "@typescript-eslint"],
   // Ces fichiers ne sont pas écrits par nous.
-  ignorePatterns: ['next-env.d.ts', 'node_modules/', '/public/'],
+  ignorePatterns: ["next-env.d.ts", "node_modules/", "/public/"],
 };
 ```
 
@@ -421,19 +423,21 @@ Cette configuration s'intègre très bien avec VSCode et son extension [ESLint](
 On va maintenant faire en sorte que ces règles et outils soient "forcés" lors d'un commit ou un push.
 
 Pour ça on utilise deux outils séparés :
-* [Husky](Note%20pour%20plus%20tard%20:%20Je%20sais%20jamais%20comment%20interpr%C3%A9ter%20ce%20genre%20de%20messages), qui va gérer pour nous les git hooks.
-* [Lint-staged](https://github.com/okonet/lint-staged), qui ne va lancer des commandes que sur certains fichiers.
+
+- [Husky](Note%20pour%20plus%20tard%20:%20Je%20sais%20jamais%20comment%20interpr%C3%A9ter%20ce%20genre%20de%20messages), qui va gérer pour nous les git hooks.
+- [Lint-staged](https://github.com/okonet/lint-staged), qui ne va lancer des commandes que sur certains fichiers.
 
 L'installation et configuration est assez simple :
 
 On installe les librairies :
+
 ```bash
 yarn add -D husky lint-staged
 ```
 
 On ajoute quelques scripts dans `package.json`
 
-```JSONc
+```json
 {
   …
   "scripts": {
@@ -449,7 +453,7 @@ On ajoute quelques scripts dans `package.json`
 
 On ajoute ensuite la configuration pour lint-staged au `package.json`
 
-```JSONc
+```json
 {
   …
   "lint-staged": {

@@ -12,7 +12,7 @@ Dans un [précédent article](./create-a-new-gem) je vous ai exposé l’ensembl
 
 ## Attentes lors du développement
 
-En tant que développeur les point les plus importants sont :
+En tant que développeur les points les plus importants sont :
 
 - La vitesse à laquelle j’ai du feedback : Si je dois attendre 2 secs à chaque fois que je sauve un fichier pour savoir si ce que j’ai fait est correct ça va me sortir de mon flow de pensées le temps que j’ai le retour. La productivité sera vraiment réduite.
 - Détecter les erreurs au plus tôt : Il faut que les outils soient disponibles de façon quasi automatique pendant le développement et pas quand je déciderai de commit et que je me rends compte des centaines d’erreurs.
@@ -63,7 +63,7 @@ const onChange = (event) => {
 };
 ```
 
-Seriez-vous capable de me donner la liste des méthodes présentes sur `event.target` et `event.current.target` et être sûr que vous les utilisez avec le bon type d’arguments ? Moi… non. TS, oui.
+Seriez-vous capable de me donner la liste des fonctions présentes sur `event.target` et `event.current.target` et être sûr que vous les utilisez avec le bon type d’arguments ? Moi… non. TS, oui.
 
 Ou encore, cas que j'ai eu tout récemment, un besoin d'utiliser les APIs de chrome pour les extensions.
 
@@ -90,7 +90,7 @@ Maintenant qu’on a un outil qui détecte une partie des erreurs et gère la do
 
 - Prettier utilise un [AST](https://prettier.io/docs/en/index.html) pour reformater le code. Plutôt qu’un outil qui ne comprend pas vraiment la logique d’une ligne de code, prettier va décomposer vos lignes de code sous la forme d’un arbre et s’en servir pour rendre un code qui suit ses différentes règles. Prettier a donc beaucoup plus de facilités à traiter des lignes complexes ou forcer des sauts de ligne aux bons endroits.
 - Prettier n’a presque pas d’options de configuration. L’idée est de couper les “_nombreuses_” discussions inutiles qui apparaissent lorsqu’on décide de la façon dont on va formater notre code. Comme beaucoup de projets se sont mis à utiliser Prettier, à travers l’écosystème javascript, beaucoup de projets ont une allure très similaire maintenant.
-- Prettier n’a pas de règles quant à la qualité de code. Prettier n’a aucun problème à ce que votre code ait des variables inutilisées ou encore des règles de performance/sécurité.
+- Prettier n’a pas de règles quant à la qualité de code. Prettier n’a aucun problème à ce que votre code ait des variables inutilisées ou des problèmes de performance/sécurité.
 
 ##### Comment ajouter Prettier à un projet ?
 
@@ -114,7 +114,7 @@ ESlint est à Javascript ce que Rubocop est à ruby. C’est un linter, très co
 
 La configuration minimale d'ESlint ressemble à :
 
-\<FileName filename=".eslintrc.js" /\>
+<FileName filename=".eslintrc.js" />
 
 ```js
 module.exports = {
@@ -147,7 +147,7 @@ Ce "script" va détecter si on utilise `npm` ou `yarn` et installer avec les dif
 
 À l'heure de l'écriture de cet article, cette commande va ajouter à notre package.json :
 
-\<FileName filename="package.json" /\>
+<FileName filename="package.json" />
 
 ```js
 "eslint": "^7.2.0",
@@ -292,7 +292,7 @@ module.exports = {
         destructuring: "all",
       },
     ],
-    // Les arrow function auront des {} seulement si nécessaire.
+    // Les arrow functions auront des {} seulement si nécessaire.
     "arrow-body-style": [2, "as-needed"],
     // Detecte les cas ou des lignes sont inutilisées
     // Le allowTaggedTemplates est là pour de la compatibilité avec
@@ -396,7 +396,7 @@ module.exports = {
 
     // La plupart du temps on veut que eslint hurle quand des variables
     // ne sont pas utilisées. On autorise certains patterns classiques.
-    // notemment les variables commençant par _
+    // notamment les variables commençant par _
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       1,

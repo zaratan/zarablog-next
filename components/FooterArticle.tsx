@@ -1,6 +1,23 @@
 import React from 'react';
 
-const FooterArticle = ({ prId }: { prId: number }) => (
+type HelperType = {
+  name: string;
+  link?: string;
+};
+
+const Helper = ({ helper }: { helper: HelperType }) => (
+  <span>
+    {helper.link ? <a href={helper.link}>{helper.name}</a> : helper.name}
+  </span>
+);
+
+const FooterArticle = ({
+  prId,
+  helpers,
+}: {
+  prId: number;
+  helpers?: Array<HelperType>;
+}) => (
   <p>
     Pour me poser plus de questions ou réagir à cet article vous pouvez aller
     directement vers la PR correspondante :{' '}
@@ -16,6 +33,28 @@ const FooterArticle = ({ prId }: { prId: number }) => (
       Ko-fi
     </a>
     .
+    {helpers && helpers.length > 0 ? (
+      <>
+        {' '}
+        Merci à{' '}
+        <span>
+          {helpers.map((helper, i) => (
+            <>
+              <Helper key={helper.name} helper={helper} />
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {helpers.length > 1 && i !== helpers.length - 1
+                ? i === helpers.length - 2
+                  ? ' et '
+                  : ', '
+                : ''}
+            </>
+          ))}
+        </span>{' '}
+        pour {helpers.length > 1 ? 'leur' : 'sa'} relecture.
+      </>
+    ) : (
+      ''
+    )}
   </p>
 );
 

@@ -5,7 +5,6 @@ module.exports = {
     'airbnb',
     'prettier',
     'plugin:prettier/recommended',
-    'prettier/react',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript',
@@ -19,12 +18,6 @@ module.exports = {
   rules: {
     'no-debugger': 0,
     'no-alert': 0,
-    'no-unused-vars': [
-      1,
-      {
-        argsIgnorePattern: 'res|next|Sequelize|^err|^_.*',
-      },
-    ],
     'prefer-const': [
       'error',
       {
@@ -97,6 +90,8 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/explicit-module-boundary-types': 0,
+    // note you must disable the base rule as it can report incorrect errors
+    'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       1,
       {

@@ -105,6 +105,14 @@ html {
   min-height: 100%;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  &.dark {
+    color-scheme: dark;
+    background-color: map-get(map-get($themes, "dark"), "base2");
+  }
+  &.light {
+    color-scheme: light;
+    background-color: map-get(map-get($themes, "light"), "base2");
+  }
 }
 
 body {

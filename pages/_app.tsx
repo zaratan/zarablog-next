@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import GoogleFonts from 'next-google-fonts';
 
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';
@@ -13,6 +13,9 @@ import { PreferencesProvider } from '../contexts/PreferencesContext';
 
 const WrappedApp = ({ Component, pageProps }: AppProps) => {
   const { isDark } = useContext(ThemeContext);
+  useEffect(() => {
+    document.querySelector('html').className = isDark ? 'dark' : 'light';
+  }, [isDark]);
   return (
     <div className={`${isDark ? 'theme--dark' : 'theme--light'}`}>
       <Component {...pageProps} />

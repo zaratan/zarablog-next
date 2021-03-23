@@ -9,9 +9,17 @@ import { fr } from 'date-fns/locale';
 import Layout from '../components/Layout';
 import ArticleList from '../components/ArticleList';
 
-export const getStaticProps: GetStaticProps = async () => {
-  const postsDirectory = path.join(process.cwd(), 'articles');
-  const filenames = fs.readdirSync(postsDirectory);
+export const getStaticProps: GetStaticProps = async ({
+  locale,
+  defaultLocale,
+}) => {
+  const postsDirectory =
+    locale === defaultLocale
+      ? path.join(process.cwd(), 'articles')
+      : path.join(process.cwd(), 'articles', locale);
+  const filenames = fs
+    .readdirSync(postsDirectory)
+    .filter((filename) => filename.includes('mdx'));
 
   const unsortedArticles: Array<{
     date: Date;

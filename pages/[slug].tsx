@@ -1,7 +1,8 @@
 import fs from 'fs';
 import Head from 'next/head';
 import path from 'path';
-import { GetStaticProps } from 'next';
+import { GetStaticProps, GetStaticPaths } from 'next';
+
 import renderToString from 'next-mdx-remote/render-to-string';
 import hydrate from 'next-mdx-remote/hydrate';
 import matter from 'gray-matter';
@@ -9,6 +10,7 @@ import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
 import remarkPrism from 'remark-prism';
 import Image from 'next/image';
+import { useRouter } from 'next/dist/client/router';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
@@ -16,16 +18,31 @@ import FooterArticle from '../components/FooterArticle';
 import ArticleContainer from '../components/Article';
 import { H2, H3, H4, H5 } from '../components/IdedHeaders';
 
-export async function getStaticPaths() {
-  const postsDirectory = path.join(process.cwd(), 'articles');
-  const filenames = fs.readdirSync(postsDirectory);
+export const getStaticPaths: GetStaticPaths = async ({
+  locales,
+  defaultLocale,
+}) => {
+  const paths = locales.reduce<
+    Array<{ params: { slug: string }; locale: string }>
+  >((result, locale) => {
+    const postsDirectory =
+      locale === defaultLocale
+        ? path.join(process.cwd(), 'articles')
+        : path.join(process.cwd(), 'articles', locale);
+    const newFilenames = fs
+      .readdirSync(postsDirectory)
+      .filter((filename) => filename.includes('mdx'));
+    const newPaths = newFilenames.map((filename) => ({
+      params: { slug: filename.replace(/\.mdx$/, '') },
+      locale,
+    }));
+    return [...result, ...newPaths];
+  }, []);
   return {
-    paths: filenames.map(
-      (filename) => ({ params: { slug: filename.replace(/\.mdx$/, '') } }) // See the "paths" section below
-    ),
+    paths,
     fallback: false,
   };
-}
+};
 
 const components = {
   Youtube,
@@ -38,8 +55,22 @@ const components = {
   h5: H5,
 };
 
-export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
-  const filePath = path.join(process.cwd(), 'articles', `${slug}.mdx`);
+export const getStaticProps: GetStaticProps = async ({
+  params: { slug },
+  locale,
+  defaultLocale,
+}) => {
+  const filePath =
+    locale === defaultLocale
+      ? path.join(process.cwd(), 'articles', `${slug}.mdx`)
+      : path.join(process.cwd(), 'articles', locale, `${slug}.mdx`);
+  if (!fs.existsSync(filePath)) {
+    return {
+      props: {
+        mustRedirect: true,
+      },
+    };
+  }
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { content, data } = matter(fileContents);
   const mdxSource = await renderToString(content, {
@@ -62,6 +93,7 @@ export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
   mdxSource.scope.date = mdxSource.scope.date.toString();
   return {
     props: {
+      mustRedirect: false,
       article: {
         mdx: mdxSource,
         data: {
@@ -77,7 +109,17 @@ export const getStaticProps: GetStaticProps = async ({ params: { slug } }) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Article = ({ article }: { article: { mdx: any; data: any } }) => {
+const Article = ({
+  article,
+  mustRedirect,
+}: {
+  article?: { mdx: any; data: any };
+  mustRedirect?: boolean;
+}) => {
+  const router = useRouter();
+  if (mustRedirect) {
+    router.replace(`/${router.locale}`);
+  }
   const content = hydrate(article.mdx, {
     components,
   });

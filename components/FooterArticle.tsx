@@ -37,7 +37,7 @@ const FooterArticle = ({
       <>
         {' '}
         Merci à{' '}
-        <span>
+        <>
           {helpers.map((helper, i) => (
             <>
               <Helper key={helper.name} helper={helper} />
@@ -49,7 +49,7 @@ const FooterArticle = ({
                 : ''}
             </>
           ))}
-        </span>{' '}
+        </>{' '}
         pour {helpers.length > 1 ? 'leur' : 'sa'} relecture.
       </>
     ) : (

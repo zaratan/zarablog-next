@@ -4,8 +4,15 @@ import Header from './Header';
 import Profile from './Profile';
 
 import styles from './Layout.module.scss';
+import classCompactor from '../helpers/classCompator';
 
-const Layout = ({ children }: { children: ReactNode }) => {
+const Layout = ({
+  children,
+  centered,
+}: {
+  children: ReactNode;
+  centered?: boolean;
+}) => {
   const { isProfileOpen } = useContext(LayoutContext);
 
   return (
@@ -13,9 +20,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <Header />
       <div className={styles.mainWrapper}>
         <main
-          className={[styles.main, isProfileOpen ? 'profile-open' : ''].join(
-            ' '
-          )}
+          className={classCompactor([
+            styles.main,
+            isProfileOpen ? 'profile-open' : '',
+            centered ? 'centered' : '',
+          ])}
         >
           {children}
         </main>

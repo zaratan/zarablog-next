@@ -1,11 +1,10 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { GetStaticProps } from 'next';
 import path from 'path';
 import fs from 'fs';
-import Link from 'next/link';
 import Layout from '../components/Layout';
+import NotFoundBody from '../components/NotFoundBody';
 
 export const getStaticProps: GetStaticProps = async ({
   locales,
@@ -41,43 +40,18 @@ export const getStaticProps: GetStaticProps = async ({
   };
 };
 
-const NotFound = ({ pathsLocales }: { pathsLocales: any }) => {
-  const router = useRouter();
-
-  const [otherLangExist, setOtherLangExist] = useState([]);
-  const [currentPath, setCurrentPath] = useState('');
-
-  useEffect(() => {
-    const endPath = window.location.href.replace(/^.*\//, '');
-    console.log({ pathsLocales });
-    setCurrentPath(endPath);
-    setOtherLangExist(pathsLocales[`${endPath}.mdx`] || []);
-  }, []);
-
-  return (
-    <>
+const NotFound = ({ pathsLocales }: { pathsLocales: any }) => (
+  <>
+    <Head>
       <Head>
-        <Head>
-          <title>Zaratan@next - 404</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+        <title>Zaratan@next - 404</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout>
-        <h1>This page doesn't exist</h1>
-        <p>
-          But it exists in other languages:{' '}
-          {otherLangExist.map((otherLang) => (
-            <Link href={currentPath} locale={otherLang}>
-              <a>{otherLang}</a>
-            </Link>
-          ))}
-          <Link href="/">
-            <a>Go to home</a>
-          </Link>
-        </p>
-      </Layout>
-    </>
-  );
-};
+    </Head>
+    <Layout centered>
+      <NotFoundBody pathsLocales={pathsLocales} />
+    </Layout>
+  </>
+);
 
 export default NotFound;

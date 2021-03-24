@@ -1,0 +1,21 @@
+{
+  "head": {
+    "ago": "When: ",
+    "time": "{{time}} ago",
+    "read-time": "Reading time: "
+  },
+  "footer": {
+    "pr": "For asking questions or reacting to this article you can go directly to the corresponding PR : ",
+    "tea": ". If you liked this article you can buy me a tea here : ",
+    "helpers": {
+      "thanks": " Thanks to ",
+      "and": " and ",
+      "for": " for their review.",
+      "for_plural": " for their reviews."
+    }
+  },
+  "youtube": {
+    "error": "This video couldn't load :(",
+    "on-youtube": "You can watch it directly on YouTube "
+  }
+}

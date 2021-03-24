@@ -1,0 +1,21 @@
+{
+  "head": {
+    "ago": "Il y a: ",
+    "time": "{{time}}",
+    "read-time": "Temps de lecture: "
+  },
+  "footer": {
+    "pr": "Pour me poser plus de questions ou réagir à cet article vous pouvez aller directement vers la PR correspondante : ",
+    "tea": ". Et si l'article vous a plus vous pouvez toujours m'offrir un thé ici : ",
+    "helpers": {
+      "thanks": " Merci à ",
+      "and": " et ",
+      "for": " pour sa relecture.",
+      "for_plural": " pour leur relecture."
+    }
+  },
+  "youtube": {
+    "error": "La vidéo ne peut pas se charger :(",
+    "on-youtube": "Vous pouvez regarder la vidéo directement sur Youtube "
+  }
+}

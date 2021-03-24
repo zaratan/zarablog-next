@@ -1,0 +1,8 @@
+{
+  "title": "This page doesn't exist",
+  "explanation": "Your article might not have been translated yet. If you would like to request a translation, please add an issue here: ",
+  "github-issue": "Github Issue",
+  "however": "However this article already exists in another language: ",
+  "however_plural": "However this article already exists in other languages: ",
+  "home": "Go to home"
+}

@@ -2,8 +2,8 @@
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useContext, useEffect } from 'react';
-import GoogleFonts from 'next-google-fonts';
-
+import { GoogleFonts } from 'next-google-fonts';
+import { appWithTranslation } from 'next-i18next';
 import ThemeContext, { ThemeContextProvider } from '../contexts/ThemeContext';
 import { LayoutProvider } from '../contexts/LayoutContext';
 
@@ -11,7 +11,7 @@ import '../styles/GlobalStyle.scss';
 import '../styles/Code.scss';
 import { PreferencesProvider } from '../contexts/PreferencesContext';
 
-const WrappedApp = ({ Component, pageProps }: AppProps) => {
+const WrappedApp = appWithTranslation(({ Component, pageProps }: AppProps) => {
   const { isDark } = useContext(ThemeContext);
   useEffect(() => {
     document.querySelector('html').className = isDark ? 'dark' : 'light';
@@ -21,7 +21,7 @@ const WrappedApp = ({ Component, pageProps }: AppProps) => {
       <Component {...pageProps} />
     </div>
   );
-};
+});
 
 function MyApp(appProps: AppProps) {
   return (

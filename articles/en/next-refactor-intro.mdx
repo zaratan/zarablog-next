@@ -1,0 +1,66 @@
+---
+title: "NextJS Refactor: Stack"
+date: 2020-11-09T05:16:13+09:00
+categories:
+  - front
+  - code
+description: "First article for a new serie talking about what are the technics used to make that blog."
+---
+
+This series of articles aims to present the front-end stack that runs this blog and take the opportunity to talk about various techniques that you might want to use.
+This first article is purely introductory and will help everyone find their way around later.
+
+You can find the blog code here if you're interested: https://github.com/zaratan/zarablog-next
+
+## React
+
+[React](https://fr.reactjs.org) is a front-end framework that allows you to create websites in JS. This framework simplifies the management of site / app state and user interactions.
+
+I had presented this a bit in the past on two occasions:
+
+- An old article: [React basics](./react-basics)
+- A serie of videos on Youtube (in-french): [Browser Extension](https://www.youtube.com/playlist?list=PLT4YMsBCL8tI2gWds-o__SlwxLmty8fXL)
+
+## NextJS
+
+[NextJS](https://nextjs.org) is a "_thin_" overlay on top of React that handles some things automatically.
+We will have the opportunity to come back to some of these points during the various articles in this series, but in bulk it manages:
+
+- Routing
+- Code spliting
+- Babel/Webpack/TypeScript configuration
+- A lot of React optimizations
+
+## Vercel
+
+[Vercel](http://vercel.com) is the company that produces NextJS.
+Previously called Zeit, its main product allows you to:
+
+- Easily deploy a front-end project
+- Deploy serverless APIs
+- Manage ones DNS domains
+
+This is the product I use for deploying this blog.
+
+## MDX
+
+[MDX](https://mdxjs.com) is like MarkDown but extended. One of the major points that is useful here is that it supports adding React components.
+
+## TypeScript
+
+[TypeScript](https://www.typescriptlang.org) is a language that will be compiled into JavaScript.
+It looks exactly like the JS with the notable difference that it adds a "type" to different things (functions, parameters, objects).
+The types will be checked at compile time to avoid certain errors in production.
+
+## Articles in the serie
+
+- How to properly load a font ([in french](./next-refactor-font))
+- Dark and Light theme (with scss) ([in french](./next-refactor-theme-scss))
+- MDX and syntaxtic coloration ([in french](./next-refactor-MDX))
+- Dev tools and deployment (Eslint, etc…) ([in french](./next-refactor-tools))
+- Internationalization (later)
+- Working on a budget (later)
+- CSS-in-JS avantages and flaws (later)
+- Usefull patterns in React (later)
+- NextJS: Why and how? (later)
+- …

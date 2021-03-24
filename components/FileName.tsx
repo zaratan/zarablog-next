@@ -1,4 +1,3 @@
-import { setMaxListeners } from 'process';
 import React, { useContext } from 'react';
 import LayoutContext from '../contexts/LayoutContext';
 import PreferencesContext from '../contexts/PreferencesContext';

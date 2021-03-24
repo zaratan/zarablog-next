@@ -114,13 +114,16 @@
 }
 
 .rightElems {
-  width: 60px;
+  width: 80px;
   display: flex;
   justify-content: space-around;
   margin-right: 1rem;
   align-items: center;
   @media only screen and (max-width: 500px) {
     display: none;
+  }
+  a {
+    font-size: 1.5rem;
   }
   span {
     display: flex;

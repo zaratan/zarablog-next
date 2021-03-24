@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
 import 'lite-youtube-embed/src/lite-yt-embed.css';
-import YoutubeErrorCatcher from './YoutubeErrorCatcher';
 
 const Youtube = ({ videoId }) => {
   useEffect(() => {
@@ -11,9 +10,5 @@ const Youtube = ({ videoId }) => {
   return <lite-youtube videoId={videoId} />;
 };
 
-const YoutubeWrap = ({ videoId }) => (
-  <YoutubeErrorCatcher videoId={videoId}>
-    <Youtube videoId={videoId} />
-  </YoutubeErrorCatcher>
-);
+const YoutubeWrap = ({ videoId }) => <Youtube videoId={videoId} />;
 export default YoutubeWrap;

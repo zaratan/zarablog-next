@@ -40,7 +40,7 @@ const Header = () => {
 
   const { scrollingUp, atTopScroll } = useScroll();
   const router = useRouter();
-  console.log({ router });
+
   return (
     <header
       className={[

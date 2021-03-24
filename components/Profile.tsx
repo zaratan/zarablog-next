@@ -3,6 +3,9 @@ import { FaEnvelope, FaGithub, FaTwitter, FaMugHot } from 'react-icons/fa';
 import Image from 'next/image';
 
 import { ImTextWidth } from 'react-icons/im';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import styles from './Profile.module.scss';
 import PreferencesContext from '../contexts/PreferencesContext';
 import Slider from './Slider';
@@ -21,6 +24,8 @@ const Profile = () => {
     PreferencesContext
   );
   const { atTopScroll, scrollingUp } = useScroll();
+  const { t } = useTranslation('common');
+  const router = useRouter();
 
   return (
     <div
@@ -32,15 +37,11 @@ const Profile = () => {
       <ImgProfilePic />
       <header>
         <h1>Zaratan</h1>
-        <h3>Les élucubrations d'un développeur fatigué</h3>
-        <p>
-          Développeur, ludiste, admin sys, grimpeur et cuisinier à mes heures.
-          Je suis curieux de tout, tout le temps. J’aime découvrir de nouvelles
-          choses et les partager.
-        </p>
+        <h3>{t('subtitle')}</h3>
+        <p>{t('description')}</p>
       </header>
       <section>
-        <h2>Me contacter</h2>
+        <h2>{t('contact')}</h2>
         <ul>
           <li>
             <FaEnvelope />
@@ -78,7 +79,7 @@ const Profile = () => {
         </ul>
       </section>
       <section>
-        <h2>Me soutenir</h2>
+        <h2>{t('support')}</h2>
         <ul>
           <li>
             <FaMugHot />
@@ -100,9 +101,17 @@ const Profile = () => {
             <ImTextWidth />
             <span className={styles.space} />
             <span>
-              Blocs de code larges :{' '}
+              {t('options.large-block')}
               <Slider active={wideCodeBlock} action={toggleWideCodeBlocks} />
             </span>
+          </li>
+          <li>
+            <Link
+              href={router.asPath}
+              locale={router.locale === 'fr' ? 'en' : 'fr'}
+            >
+              <a>{t('options.language')}</a>
+            </Link>
           </li>
         </ul>
       </section>

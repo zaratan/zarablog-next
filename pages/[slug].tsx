@@ -10,7 +10,7 @@ import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
 import remarkPrism from 'remark-prism';
 import Image from 'next/image';
-import { useRouter } from 'next/dist/client/router';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Layout from '../components/Layout';
 import Youtube from '../components/Youtube';
 import FileName from '../components/FileName';
@@ -64,13 +64,6 @@ export const getStaticProps: GetStaticProps = async ({
     locale === defaultLocale
       ? path.join(process.cwd(), 'articles', `${slug}.mdx`)
       : path.join(process.cwd(), 'articles', locale, `${slug}.mdx`);
-  if (!fs.existsSync(filePath)) {
-    return {
-      props: {
-        mustRedirect: true,
-      },
-    };
-  }
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { content, data } = matter(fileContents);
   const mdxSource = await renderToString(content, {
@@ -93,7 +86,6 @@ export const getStaticProps: GetStaticProps = async ({
   mdxSource.scope.date = mdxSource.scope.date.toString();
   return {
     props: {
-      mustRedirect: false,
       article: {
         mdx: mdxSource,
         data: {
@@ -104,22 +96,13 @@ export const getStaticProps: GetStaticProps = async ({
           ),
         },
       },
+      ...(await serverSideTranslations(locale, ['common', 'article'])),
     },
   };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Article = ({
-  article,
-  mustRedirect,
-}: {
-  article?: { mdx: any; data: any };
-  mustRedirect?: boolean;
-}) => {
-  const router = useRouter();
-  if (mustRedirect) {
-    router.replace(`/${router.locale}`);
-  }
+const Article = ({ article }: { article?: { mdx: any; data: any } }) => {
   const content = hydrate(article.mdx, {
     components,
   });

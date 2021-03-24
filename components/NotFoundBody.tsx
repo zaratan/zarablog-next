@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'next-i18next';
 import classes from './NotFoundBody.module.scss';
 
 const LANG_MAPPING = {
@@ -11,29 +12,27 @@ const LANG_MAPPING = {
 const NotFoundBody = ({ pathsLocales }: { pathsLocales: any }) => {
   const router = useRouter();
   const currentPath = router.asPath.replace(/^.*\//, '');
-  console.log({ currentPath });
   const otherLangExist = pathsLocales[`${currentPath}.mdx`] || [];
+
+  const { t } = useTranslation('404');
 
   return (
     <div className={classes.container}>
-      <h1>This page doesn't exist</h1>
+      <h1>{t('title')}</h1>
       <p>
-        Your article might not have been translated yet. If you would like to
-        request a translation, please add an issue here:{' '}
+        {t('explanation')}
         <a
           href="https://github.com/zaratan/zarablog-next/issues"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Github Issue
+          {t('github-issue')}
         </a>
         .
       </p>
       {otherLangExist.length === 0 ? null : (
         <ul>
-          However this article already exists in{' '}
-          {otherLangExist.length === 1 ? 'an' : ''}other language
-          {otherLangExist.length === 1 ? '' : 's'}:{' '}
+          {t('however', { count: otherLangExist.length })}
           {otherLangExist.map((otherLang, i) => (
             <li key={`${currentPath}-${otherLang}`}>
               <Link href={`/${currentPath}`} locale={otherLang}>
@@ -46,7 +45,7 @@ const NotFoundBody = ({ pathsLocales }: { pathsLocales: any }) => {
       )}
       <p>
         <Link href="/">
-          <a>Go to home</a>
+          <a>{t('home')}</a>
         </Link>
       </p>
     </div>

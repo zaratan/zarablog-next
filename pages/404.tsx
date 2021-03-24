@@ -3,25 +3,27 @@ import React from 'react';
 import { GetStaticProps } from 'next';
 import path from 'path';
 import fs from 'fs';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Layout from '../components/Layout';
 import NotFoundBody from '../components/NotFoundBody';
 
 export const getStaticProps: GetStaticProps = async ({
   locales,
+  locale,
   defaultLocale,
 }) => {
   const localesPaths = locales.reduce<
     Array<{ locale: string; filenames: Array<string> }>
-  >((res, locale) => {
+  >((res, newLocale) => {
     const postsDirectory =
-      locale === defaultLocale
+      newLocale === defaultLocale
         ? path.join(process.cwd(), 'articles')
-        : path.join(process.cwd(), 'articles', locale);
+        : path.join(process.cwd(), 'articles', newLocale);
     const filenames = fs
       .readdirSync(postsDirectory)
       .filter((filename) => filename.includes('mdx'));
 
-    return [...res, { locale, filenames }];
+    return [...res, { locale: newLocale, filenames }];
   }, []);
 
   const pathsLocales = localesPaths.reduce<any>((res, localePaths) => {
@@ -36,6 +38,7 @@ export const getStaticProps: GetStaticProps = async ({
   return {
     props: {
       pathsLocales,
+      ...(await serverSideTranslations(locale, ['common', '404'])),
     },
   };
 };

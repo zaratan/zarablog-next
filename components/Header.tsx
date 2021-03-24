@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import { isBrowser } from 'react-device-detect';
 import { FaSun, FaMoon, FaUser, FaHome } from 'react-icons/fa';
 import { ImTextWidth } from 'react-icons/im';
+import { useRouter } from 'next/router';
 import ThemeContext from '../contexts/ThemeContext';
 import LayoutContext from '../contexts/LayoutContext';
 import { useScroll } from '../hooks/useScroll';
@@ -38,7 +39,8 @@ const Header = () => {
   };
 
   const { scrollingUp, atTopScroll } = useScroll();
-
+  const router = useRouter();
+  console.log({ router });
   return (
     <header
       className={[
@@ -108,6 +110,12 @@ const Header = () => {
         </Link>
       </h1>
       <span className={styles.rightElems}>
+        <Link
+          href={router.asPath}
+          locale={router.locale === 'fr' ? 'en' : 'fr'}
+        >
+          <a>{router.locale === 'fr' ? 'EN' : 'FR'}</a>
+        </Link>
         <span
           tabIndex={0}
           role="button"

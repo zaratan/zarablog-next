@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import classes from './NotFoundBody.module.scss';
 
@@ -8,14 +9,10 @@ const LANG_MAPPING = {
 };
 
 const NotFoundBody = ({ pathsLocales }: { pathsLocales: any }) => {
-  const [otherLangExist, setOtherLangExist] = useState([]);
-  const [currentPath, setCurrentPath] = useState('');
-
-  useEffect(() => {
-    const endPath = window.location.href.replace(/^.*\//, '');
-    setCurrentPath(endPath);
-    setOtherLangExist(pathsLocales[`${endPath}.mdx`] || []);
-  }, [pathsLocales]);
+  const router = useRouter();
+  const currentPath = router.asPath.replace(/^.*\//, '');
+  console.log({ currentPath });
+  const otherLangExist = pathsLocales[`${currentPath}.mdx`] || [];
 
   return (
     <div className={classes.container}>
@@ -33,23 +30,19 @@ const NotFoundBody = ({ pathsLocales }: { pathsLocales: any }) => {
         .
       </p>
       {otherLangExist.length === 0 ? null : (
-        <p>
+        <ul>
           However this article already exists in{' '}
           {otherLangExist.length === 1 ? 'an' : ''}other language
           {otherLangExist.length === 1 ? '' : 's'}:{' '}
           {otherLangExist.map((otherLang, i) => (
-            <>
-              <Link
-                href={currentPath}
-                key={`${currentPath}-${otherLang}`}
-                locale={otherLang}
-              >
+            <li key={`${currentPath}-${otherLang}`}>
+              <Link href={`/${currentPath}`} locale={otherLang}>
                 <a>{LANG_MAPPING[otherLang]}</a>
               </Link>
               {i === otherLangExist.length - 1 ? '.' : ', '}
-            </>
+            </li>
           ))}
-        </p>
+        </ul>
       )}
       <p>
         <Link href="/">

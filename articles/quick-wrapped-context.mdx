@@ -1,0 +1,266 @@
+---
+title: "Bloc de code: Wrapped context"
+date: 2021-03-26T18:00:13+09:00
+categories:
+  - javascript
+  - code
+description: "Snippet de code: Les contexts empaquetés."
+---
+
+Ceci est un article snippet de code que vous pouvez presque copier coller tel quel. Il y aura peu d'explications superflues.
+
+## Le problème
+
+L'utilisation classique de [Contexte](https://reactjs.org/docs/context.html) dans React se comporte souvent de la manière suivante:
+
+```jsx
+// Quelque part dans le code
+const MyContext = React.createContext(defaultValue);
+
+// Assez haut dans votre hiérarchie de classe
+const App = () => (
+  <MyContext.Provider value={{ a: "bb" }}>…REST OF THE APP</MyContext.Provider>
+);
+
+// Dans un component plus tard
+const MyComponent = () => {
+  const { a } = useContext(MyContext);
+
+  return <p>{a}</p>;
+};
+```
+
+Si l'on veut avoir une variable a modifier dans notre contexte, il va faloir avoir un state… Qui va devoir vivre dans l'app.
+
+```jsx
+const App = () => {
+  const [myState, setMyState] = useState("base_value");
+  return (
+    <MyContext.Provider value={{ a: "bb", myState, setMyState }}>
+      …REST OF THE APP
+    </MyContext.Provider>
+  );
+};
+```
+
+Et dès qu'on veut faire des choses un peu plus complexes on se retrouve vite a poluer notre App.
+
+Les problèmes sont donc:
+
+- Polution d'un component très haut niveau;
+- `.Provider` c'est pas très beau;
+- Ajouter TypeScript dans la danse et ça devient un enfer.
+
+## Le snippet
+
+On va commmencer par une version Javascript puis une version TypeScript. Chaque example sera fortement commenté donc je fournirai des versions sans commentaire en dessous.
+
+### Javascript avec commentaires
+
+<FileName filename="ExampleContext.jsx" />
+
+```jsx
+import React, { createContext, useState, useEffect } from "react";
+
+// Ce "default" sert a définir les valeurs par défaut et sert surtout pour connaitre le style de contexte.
+const defaultContext = {
+  myValue: "DEFAULT",
+  // Cette fonction ne devrait jamais être utilisée
+  myFunction: () => {
+    throw new Error("THIS SHOULD BE OVERRIDEN");
+  },
+};
+
+// On crée le contexte qui reste local à ce fichier.
+const ExampleContext = createContext(defaultContext);
+
+// Ça sera le Provider qu'on utilisera dans notre app.
+export const ExampleProvider = ({ children, defaultValue }) => {
+  const [myValue, setMyValue] = useState(defaultValue);
+  const myFunction = () => {
+    setMyValue(myValue + 1);
+  };
+  const context = { myValue, myFunction };
+
+  useEffect(() => {
+    // Faire des choses quand le contexte est initialisé
+  }, []);
+
+  return (
+    // Le .Provider est fait ici
+    <ExampleContext.Provider value={context}>
+      {children}
+    </ExampleContext.Provider>
+  );
+};
+
+export default ExampleContext;
+```
+
+Et ailleurs on l'utilisera de la façon suivante:
+
+```jsx
+import { ExampleProvider } from "…/ExampleContext";
+// Assez haut dans votre hiérarchie de classe
+const App = () => (
+  <ExampleProvider defaultValue={"bb"}>…REST OF THE APP</ExampleProvider>
+);
+```
+
+```jsx
+import ExampleContext from "…/ExampleContext";
+
+// Dans un component plus tard
+const MyComponent = () => {
+  const { myValue, myFunction } = useContext(ExampleContext);
+
+  return <p>{a}</p>;
+};
+```
+
+On a donc empaqueté la logique propre a notre contexte à l'interieur d'un composant intermédiaire.
+
+### TypeScript avec commentaires
+
+La version TypeScript est très similaire à la différence qu'on type notre contexte.
+
+<FileName filename="ExampleContext.tsx" />
+
+```tsx
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+
+// Dans la version type script on type notre contexte
+type ExampleContextType = {
+  myValue: string;
+  myFunction: () => void;
+};
+
+const defaultContext: ExampleContextType = {
+  myValue: "DEFAULT",
+  myFunction: () => {
+    throw new Error("THIS SHOULD BE OVERRIDEN");
+  },
+};
+
+const ExampleContext = createContext(defaultContext);
+
+export const ExampleProvider = ({
+  defaultValue,
+  children,
+}: {
+  defaultValue?: string;
+  children: ReactNode;
+}) => {
+  const [myValue, setMyValue] = useState(defaultValue || "");
+
+  const myFunction = () => {
+    setMyValue(myValue + 1);
+  };
+
+  const context = { myValue, myFunction };
+  return (
+    <ExampleContext.Provider value={context}>
+      {children}
+    </ExampleContext.Provider>
+  );
+};
+
+export default ExampleContext;
+```
+
+Et on l'utilise ailleurs exactement de la même façon. Vous pouvex trouver un exemple utilisé dans ce blog [ici](https://github.com/zaratan/zarablog-next/blob/main/contexts/ThemeContext.tsx).
+
+### Javascript version copy-paste
+
+<FileName filename="ExampleContext.jsx" />
+
+```jsx
+import React, { createContext, useState, useEffect } from "react";
+
+const defaultContext = {};
+
+const ExampleContext = createContext(defaultContext);
+
+export const ExampleProvider = ({ children }) => {
+  const context = {};
+
+  return (
+    <ExampleContext.Provider value={context}>
+      {children}
+    </ExampleContext.Provider>
+  );
+};
+
+export default ExampleContext;
+```
+
+### TypeScript version copy-paste
+
+```tsx
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+
+type ExampleContextType = {};
+
+const defaultContext: ExampleContextType = {};
+
+const ExampleContext = createContext(defaultContext);
+
+export const ExampleProvider = ({ children }: { children: ReactNode }) => {
+  const context = {};
+
+  return (
+    <ExampleContext.Provider value={context}>
+      {children}
+    </ExampleContext.Provider>
+  );
+};
+
+export default ExampleContext;
+```
+
+### Bonus VSCode snippet
+
+```json
+{
+  "Typescript context": {
+    "prefix": "tcontext",
+    "body": [
+      "/* eslint-disable @typescript-eslint/no-empty-function */",
+      "import React, { createContext, useState, useEffect, ReactNode } from 'react';",
+      "",
+      "type ContextType = {$0}",
+      "",
+      "const defaultContext: ContextType = {",
+      "};",
+      "const $1Context = createContext(defaultContext);",
+      "export const $1Provider = ({",
+      "\tchildren,",
+      "}: {",
+      "\tchildren: ReactNode;",
+      "}) => {",
+      "\tconst context: ContextType = {}",
+      "\treturn (",
+      "\t\t<$1Context.Provider",
+      "\t\t\tvalue={",
+      "\t\t\t\tcontext",
+      "\t\t\t}",
+      "\t\t>",
+      "\t\t\t{children}",
+      "\t\t</$1Context.Provider>",
+      "\t);",
+      "};",
+      "",
+      "export default $1Context;"
+    ],
+    "description": "Empty context with typescript"
+  }
+}
+```
+
+## Conclusion
+
+On a un contexte avec une logique empaquetée. Personnellement, je n'utilise React Context que de cette façon.
+
+Si ce style d'article vous plait n'hésitez pas à me laisser un petit message :)
+
+<FooterArticle prId={14} />

@@ -22,9 +22,8 @@ export const headerVisisble = (atTopScroll, scrollingUp) =>
 const Header = () => {
   const { isDark, toggleDark } = useContext(ThemeContext);
   const { toggleProfileOpen, closeProfile } = useContext(LayoutContext);
-  const { toggleWideCodeBlocks, wideCodeBlock } = useContext(
-    PreferencesContext
-  );
+  const { toggleWideCodeBlocks, wideCodeBlock } =
+    useContext(PreferencesContext);
   const actOnLightButton = () => {
     toggleDark();
   };

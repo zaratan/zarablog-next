@@ -9,6 +9,7 @@ const LANG_MAPPING = {
   en: 'English',
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const NotFoundBody = ({ pathsLocales }: { pathsLocales: any }) => {
   const router = useRouter();
   const currentPath = router.asPath.replace(/^.*\//, '');

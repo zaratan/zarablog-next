@@ -1,12 +1,12 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import fs from 'fs';
 import Head from 'next/head';
 import path from 'path';
 import { GetStaticProps, GetStaticPaths } from 'next';
 
-import renderToString from 'next-mdx-remote/render-to-string';
-import hydrate from 'next-mdx-remote/hydrate';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote';
 import matter from 'gray-matter';
-import { MDXProvider } from '@mdx-js/react';
 import readingTime from 'reading-time';
 import remarkPrism from 'remark-prism';
 import Image from 'next/image';
@@ -66,13 +66,10 @@ export const getStaticProps: GetStaticProps = async ({
       : path.join(process.cwd(), 'articles', locale, `${slug}.mdx`);
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { content, data } = matter(fileContents);
-  const mdxSource = await renderToString(content, {
-    components,
+  const mdxSource = await serialize(content, {
     mdxOptions: {
       rehypePlugins: [],
       remarkPlugins: [
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         [
           remarkPrism,
           {
@@ -103,9 +100,6 @@ export const getStaticProps: GetStaticProps = async ({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Article = ({ article }: { article?: { mdx: any; data: any } }) => {
-  const content = hydrate(article.mdx, {
-    components,
-  });
   const title = `Zaratan@next: ${article.data.title}`;
   const { description } = article.data;
   return (
@@ -120,15 +114,13 @@ const Article = ({ article }: { article?: { mdx: any; data: any } }) => {
         <meta name="twitter:description" content={description} />
       </Head>
       <Layout>
-        <MDXProvider>
-          <ArticleContainer
-            title={article.data.title}
-            timeToRead={article.data.readingTime}
-            date={article.data.date}
-          >
-            {content}
-          </ArticleContainer>
-        </MDXProvider>
+        <ArticleContainer
+          title={article.data.title}
+          timeToRead={article.data.readingTime}
+          date={article.data.date}
+        >
+          <MDXRemote {...article.mdx} components={components} />
+        </ArticleContainer>
       </Layout>
     </>
   );

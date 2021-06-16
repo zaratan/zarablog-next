@@ -15,14 +15,13 @@ import { headerVisisble } from './Header';
 
 const ImgProfilePic = () => (
   <div className={styles.pictureContainer}>
-    <Image src="/profile.jpg" width="200" height="200" />
+    <Image src="/profile.jpg" width="200" height="200" alt="profile" />
   </div>
 );
 
 const Profile = () => {
-  const { wideCodeBlock, toggleWideCodeBlocks } = useContext(
-    PreferencesContext
-  );
+  const { wideCodeBlock, toggleWideCodeBlocks } =
+    useContext(PreferencesContext);
   const { atTopScroll, scrollingUp } = useScroll();
   const { t } = useTranslation('common');
   const router = useRouter();

@@ -18,7 +18,7 @@
     "gray-matter": "^4.0.3",
     "lite-youtube-embed": "^0.2.0",
     "lodash": "^4.17.21",
-    "next": "11.0.0",
+    "next": "11.1.0",
     "next-google-fonts": "2.2.0",
     "next-i18next": "^8.5.0",
     "next-mdx-remote": "^3.0.2",
